@@ -1,0 +1,111 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+footer {
+  @include full_width;
+  padding-block: 6vw;
+
+  @include breakpoint(large) {
+    padding-bottom: 4vw;
+  }
+
+  .footer_container {
+    width: 100%;
+    height: 100%;
+    background-color: $c_dark;
+    padding: rem(20);
+    display: flex;
+    flex-direction: column;
+    gap: rem(50);
+
+    @include breakpoint(large) {
+      padding: rem(40);
+      gap: rem(100);
+    }
+
+    nav {
+      color: $c_yellow;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: rem(10);
+      row-gap: rem(5);
+      flex-wrap: wrap;
+
+      @include breakpoint(large) {
+        font-size: rem(18);
+      }
+
+      a {
+        width: fit-content;
+
+        @include breakpoint(large) {
+          transition: color 300ms $e_quart;
+
+          &:hover {
+            color: $c_red;
+          }
+        }
+      }
+    }
+
+    .bottom {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      .logo {
+        display: block;
+        color: $c_light;
+        @include rische;
+        font-size: rem(40);
+        line-height: rem(38);
+        width: min-content;
+
+        @include breakpoint(large) {
+          font-size: rem(60);
+          line-height: rem(58);
+          transition: color 300ms $e_quart;
+
+          &:hover {
+            color: $c_red;
+          }
+        }
+      }
+
+      .socials {
+        display: flex;
+        gap: rem(10);
+        align-self: flex-end;
+        padding-bottom: rem(5);
+
+        @include breakpoint(large) {
+          padding-bottom: rem(0);
+        }
+
+        a {
+          display: flex;
+          align-items: flex-end;
+
+          @include breakpoint(large) {
+            &:hover {
+              svg {
+                fill: $c_red;
+              }
+            }
+          }
+        }
+
+        svg {
+          width: rem(16);
+          height: rem(16);
+          fill: $c_yellow;
+          transition: fill 300ms $e_quart;
+
+          @include breakpoint(large) {
+            width: rem(20);
+            height: rem(20);
+          }
+        }
+      }
+    }
+  }
+}

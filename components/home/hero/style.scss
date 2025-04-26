@@ -1,0 +1,233 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#Hero {
+  width: 100vw;
+  max-width: 100%;
+  height: 200vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+
+    .bg_container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      z-index: 1;
+      background-color: $c_light;
+      overflow: hidden;
+
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        inset: 0;
+        object-fit: cover;
+        z-index: 1;
+        mix-blend-mode: exclusion;
+        filter: brightness(1.5) contrast(1.25);
+
+        @include breakpoint(large) {
+          object-position: 50% 45%;
+        }
+      }
+
+      .seamless {
+        position: absolute;
+        width: 100%;
+        height: 50%;
+        bottom: 0;
+        background: -webkit-linear-gradient(transparent, $c_dark);
+        background: -moz-linear-gradient(transparent, $c_dark);
+        background: -ms-linear-gradient(transparent, $c_dark);
+        background: -o-linear-gradient(transparent, $c_dark);
+        background: linear-gradient(to top, $c_dark 15%, transparent 100%);
+        z-index: 2;
+      }
+    }
+
+    .hero_content {
+      position: relative;
+      z-index: 2;
+      color: $c_dark;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      h1 {
+        position: relative;
+        width: min-content;
+        text-align: center;
+        font-size: rem(80);
+        line-height: rem(70);
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+
+        @include breakpoint(medium) {
+          font-size: rem(150);
+          line-height: rem(120);
+        }
+
+        @include breakpoint(large) {
+          font-size: rem(200);
+          line-height: rem(160);
+          top: rem(100);
+        }
+      }
+
+      .window {
+        width: 90%;
+        height: 60%;
+        background-color: $c_yellow;
+        border-top-left-radius: 500px;
+        border-top-right-radius: 500px;
+        transform-origin: bottom;
+        position: relative;
+        z-index: 1;
+
+        @include breakpoint(medium) {
+          width: 60%;
+        }
+
+        @include breakpoint(large) {
+          width: 30%;
+          height: 70%;
+        }
+      }
+    }
+  }
+
+  h2 {
+    position: absolute;
+    z-index: 3;
+    color: $c_light;
+    background-color: $c_dark;
+    padding: rem(5) rem(10);
+    bottom: 52%;
+    font-family: $f_helvetica-light;
+    font-weight: 100;
+    text-transform: uppercase;
+    font-size: rem(20);
+    //mix-blend-mode: exclusion;
+
+    @include breakpoint(medium) {
+      font-size: rem(25);
+    }
+  }
+
+  .sahil_img {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    transform-origin: bottom;
+
+    img {
+      position: absolute;
+      bottom: 0;
+      height: 60%;
+
+      @include breakpoint(medium) {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      @include breakpoint(large) {
+        height: 75%;
+      }
+    }
+  }
+
+  .bottom {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    gap: rem(20);
+    flex-direction: column;
+    align-items: center;
+    background-color: $c_light;
+
+    position: relative;
+    z-index: 1;
+    padding-inline: 6vw;
+    padding-top: rem(240);
+    overflow-y: hidden;
+
+    @include breakpoint(medium) {
+      padding-top: rem(450);
+    }
+
+    @include breakpoint(large) {
+      padding-top: rem(500);
+      padding-inline: 10vw;
+    }
+
+    .bg {
+      position: absolute;
+      top: 0;
+      width: 90%;
+      height: 100%;
+      background-color: $c_yellow;
+    }
+
+    p {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      column-gap: rem(4);
+      font-family: $f_helvetica-medium;
+      text-transform: uppercase;
+      width: 25ch;
+      font-weight: 100;
+      align-self: flex-start;
+      font-size: rem(14);
+
+      @include breakpoint(medium) {
+        font-size: rem(24);
+        column-gap: rem(6);
+      }
+
+      @include breakpoint(large) {
+        font-size: rem(28);
+        column-gap: rem(8);
+      }
+    }
+
+    .text_one {
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    .text_two {
+      width: fit-content;
+      align-self: flex-end;
+
+      p {
+        width: 28ch;
+      }
+    }
+
+    h3 {
+      z-index: 2;
+    }
+  }
+}

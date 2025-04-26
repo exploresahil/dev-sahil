@@ -1,0 +1,133 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#Header {
+  $x: rem(80);
+  & {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: $x;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 90;
+    @include full_width;
+  }
+
+  a {
+    position: relative;
+    z-index: 1;
+    text-transform: uppercase;
+
+    &:nth-of-type(2) {
+      color: $c_red;
+    }
+
+    svg {
+      color: $c_red;
+      transition: color 0.3s $e_quart;
+    }
+  }
+
+  .gradient-blur {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    height: rem(80);
+    pointer-events: none;
+  }
+
+  .gradient-blur > div,
+  .gradient-blur::before,
+  .gradient-blur::after {
+    position: absolute;
+    inset: 0;
+  }
+  .gradient-blur::before {
+    content: "";
+    z-index: 1;
+    backdrop-filter: blur(0.5px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 12.5%,
+      rgba(0, 0, 0, 1) 25%,
+      rgba(0, 0, 0, 0) 37.5%
+    );
+  }
+  .gradient-blur > div:nth-of-type(1) {
+    z-index: 2;
+    backdrop-filter: blur(1px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 12.5%,
+      rgba(0, 0, 0, 1) 25%,
+      rgba(0, 0, 0, 1) 37.5%,
+      rgba(0, 0, 0, 0) 50%
+    );
+  }
+  .gradient-blur > div:nth-of-type(2) {
+    z-index: 3;
+    backdrop-filter: blur(2px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 25%,
+      rgba(0, 0, 0, 1) 37.5%,
+      rgba(0, 0, 0, 1) 50%,
+      rgba(0, 0, 0, 0) 62.5%
+    );
+  }
+  .gradient-blur > div:nth-of-type(3) {
+    z-index: 4;
+    backdrop-filter: blur(4px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 37.5%,
+      rgba(0, 0, 0, 1) 50%,
+      rgba(0, 0, 0, 1) 62.5%,
+      rgba(0, 0, 0, 0) 75%
+    );
+  }
+  .gradient-blur > div:nth-of-type(4) {
+    z-index: 5;
+    backdrop-filter: blur(8px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 50%,
+      rgba(0, 0, 0, 1) 62.5%,
+      rgba(0, 0, 0, 1) 75%,
+      rgba(0, 0, 0, 0) 87.5%
+    );
+  }
+  .gradient-blur > div:nth-of-type(5) {
+    z-index: 6;
+    backdrop-filter: blur(16px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 62.5%,
+      rgba(0, 0, 0, 1) 75%,
+      rgba(0, 0, 0, 1) 87.5%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+  .gradient-blur > div:nth-of-type(1) {
+    z-index: 7;
+    backdrop-filter: blur(32px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 75%,
+      rgba(0, 0, 0, 1) 87.5%,
+      rgba(0, 0, 0, 1) 100%
+    );
+  }
+  .gradient-blur::after {
+    content: "";
+    z-index: 8;
+    backdrop-filter: blur(64px);
+    mask: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0) 87.5%,
+      rgba(0, 0, 0, 1) 100%
+    );
+  }
+}

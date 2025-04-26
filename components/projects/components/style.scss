@@ -1,0 +1,71 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#Components {
+  padding-block: rem(40) rem(40);
+  display: flex;
+  flex-direction: column;
+  gap: rem(30);
+  @include full_width;
+  @include project_title_img;
+
+  .components {
+    display: flex;
+    flex-direction: column;
+    gap: rem(16);
+
+    @include breakpoint(medium) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include breakpoint(large) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    a {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      //background-color: $c_dark;
+      border: rem(1) solid $c_gray;
+      padding: rem(20) rem(20);
+      color: $c_dark;
+      font-size: rem(18);
+
+      @include breakpoint(large) {
+        transition: background-color 250ms $e_quart, color 250ms $e_quart,
+          border 250ms $e_quart;
+        &:hover {
+          border: rem(1) solid $c_light;
+          background-color: $c_red;
+          color: $c_light;
+
+          .left {
+            p {
+              color: $c_light;
+            }
+          }
+        }
+      }
+
+      .left {
+        display: flex;
+        flex-direction: column;
+        max-width: 80%;
+        gap: rem(10);
+
+        h4 {
+          font-family: $f_geist_sans;
+          font-weight: 600;
+        }
+
+        p {
+          font-size: rem(14);
+          color: $c_dark;
+          transition: color 250ms $e_quart;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#ComponentHeader {
+  display: flex;
+  justify-content: space-between;
+  padding-block: rem(10);
+  margin-top: rem(80);
+  border-block: rem(0.1) solid $c_gray;
+  @include full_width;
+
+  .header-title {
+    display: flex;
+    flex-direction: column;
+    gap: rem(2);
+    max-width: 80%;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: rem(5);
+      color: $c_blue;
+    }
+
+    h2 {
+      font-size: rem(30);
+    }
+
+    h3 {
+      font-family: $f_helvetica_light;
+      text-transform: uppercase;
+      font-size: rem(16);
+      margin-top: rem(2);
+    }
+  }
+}

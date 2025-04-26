@@ -1,0 +1,68 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: $f_helvetica;
+  background-color: $c_light;
+  color: $c_dark;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: inherit;
+}
+
+h1 {
+  @include rische;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+select,
+input,
+textarea {
+  font-family: inherit;
+}
+
+#blank,
+.blank {
+  @include full_height;
+  background-color: $c_dark;
+}

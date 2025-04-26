@@ -1,0 +1,69 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#Design {
+  padding-block: rem(40) rem(40);
+  display: flex;
+  flex-direction: column;
+  gap: rem(40);
+  @include full_width;
+  @include project_title_img;
+
+  @include breakpoint(large) {
+    gap: rem(60);
+  }
+
+  .designs {
+    display: grid;
+    gap: rem(20);
+
+    @include breakpoint(medium) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include breakpoint(large) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    .brans_card {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: rem(15);
+      padding: rem(20);
+      color: $c_dark;
+      border-radius: rem(10);
+      border: rem(0.1) solid $c_gray;
+      @include project_img;
+
+      .img_container {
+        img {
+          background-color: $c_light;
+          object-fit: contain;
+        }
+      }
+
+      h3 {
+        font-family: $f_geist_sans;
+      }
+
+      a {
+        width: 100%;
+        background-color: $c_dark;
+        color: $c_yellow;
+        display: grid;
+        place-content: center;
+        padding-block: rem(10);
+        border-radius: rem(10);
+        font-family: $f_geist_sans;
+        font-weight: 600;
+
+        transition: background-color 250ms $e_quart, color 250ms $e_quart;
+
+        &:hover {
+          background-color: $c_blue;
+          color: $c_light;
+        }
+      }
+    }
+  }
+}

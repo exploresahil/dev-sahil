@@ -1,0 +1,29 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#TextHashTyping {
+  height: fit-content;
+  display: flex;
+  column-gap: rem(15);
+  flex-wrap: wrap;
+
+  @include breakpoint(large) {
+    column-gap: rem(24);
+  }
+
+  .word {
+    display: flex;
+    .letters {
+      position: relative;
+      display: inline-block;
+
+      .block {
+        position: absolute;
+        top: rem(3);
+        bottom: rem(3);
+        left: rem(1);
+        right: 0;
+        opacity: 0;
+      }
+    }
+  }
+}
