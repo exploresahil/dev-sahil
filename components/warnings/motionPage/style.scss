@@ -1,0 +1,43 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#MotionPage {
+  padding-block: rem(20);
+  display: flex;
+  flex-direction: column;
+  gap: rem(20);
+  @include full_width;
+
+  h1 {
+    font-size: rem(36);
+    font-weight: normal;
+  }
+
+  .os {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    p {
+      font-size: rem(16);
+      font-weight: 100;
+    }
+
+    span {
+      font-weight: bold;
+      font-size: rem(16);
+    }
+
+    ol {
+      list-style-type: decimal;
+      padding-left: rem(20);
+      display: flex;
+      flex-direction: column;
+      gap: rem(10);
+
+      li,
+      span {
+        font-size: rem(16);
+      }
+    }
+  }
+}

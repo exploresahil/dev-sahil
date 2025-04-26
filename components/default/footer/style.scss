@@ -11,7 +11,7 @@ footer {
   .footer_container {
     width: 100%;
     height: 100%;
-    background-color: $c_dark;
+    background-color: $c_text_primary;
     padding: rem(20);
     display: flex;
     flex-direction: column;
@@ -23,7 +23,7 @@ footer {
     }
 
     nav {
-      color: $c_yellow;
+      color: $c_secondary;
       display: grid;
       grid-template-columns: 1fr 1fr;
       column-gap: rem(10);
@@ -41,7 +41,7 @@ footer {
           transition: color 300ms $e_quart;
 
           &:hover {
-            color: $c_red;
+            color: $c_primary;
           }
         }
       }
@@ -54,7 +54,7 @@ footer {
 
       .logo {
         display: block;
-        color: $c_light;
+        color: $c_text_secondary;
         @include rische;
         font-size: rem(40);
         line-height: rem(38);
@@ -66,7 +66,7 @@ footer {
           transition: color 300ms $e_quart;
 
           &:hover {
-            color: $c_red;
+            color: $c_primary;
           }
         }
       }
@@ -88,7 +88,7 @@ footer {
           @include breakpoint(large) {
             &:hover {
               svg {
-                fill: $c_red;
+                fill: $c_primary;
               }
             }
           }
@@ -97,7 +97,7 @@ footer {
         svg {
           width: rem(16);
           height: rem(16);
-          fill: $c_yellow;
+          fill: $c_secondary;
           transition: fill 300ms $e_quart;
 
           @include breakpoint(large) {

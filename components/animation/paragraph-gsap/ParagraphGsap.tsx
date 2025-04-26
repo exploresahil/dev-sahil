@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
+import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
 
 const ParagraphGsap = ({
   text,
@@ -38,6 +39,7 @@ const ParagraphGsap = ({
   const MainRef = useRef<HTMLDivElement>(null);
   const bioRef = useRef<HTMLParagraphElement | any>(null);
   const words = text.split(" ");
+  const shouldUseMotion = useShouldUseMotion();
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger, CustomEase);
@@ -47,13 +49,13 @@ const ParagraphGsap = ({
       const animation = gsap.fromTo(
         spans,
         {
-          y: yStart,
-          x: xStart,
-          opacity: 0,
+          y: shouldUseMotion ? yStart : 0,
+          x: shouldUseMotion ? xStart : 0,
+          opacity: shouldUseMotion ? 0 : 1,
         },
         {
-          y: yEnd,
-          x: xEnd,
+          y: shouldUseMotion ? yEnd : 0,
+          x: shouldUseMotion ? xEnd : 0,
           opacity: 1,
           stagger,
           ease: CustomEase.create("cubic-bezier", "0.45, 0, 0.55, 1"),

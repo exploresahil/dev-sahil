@@ -1,0 +1,47 @@
+@use "@/app/(client)/scss/abstracts" as *;
+
+#MotionWarning {
+  height: 100%;
+  position: fixed;
+  z-index: 100;
+  @include full_width;
+  background-color: hsl(from $c_text_primary h s l / 0.5);
+
+  .warning_bg {
+    padding-block: rem(20);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: hsl(from $c_text_secondary h s l / 0.75);
+    backdrop-filter: blur(rem(50));
+    border-top-right-radius: rem(20);
+    border-top-left-radius: rem(20);
+    border-top: rem(1) solid hsl(from $c_text_primary h s l / 0.25);
+    @include full_padding_x;
+  }
+
+  svg {
+    color: $c_primary;
+  }
+
+  .warning_content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: rem(10);
+    line-height: 1.3;
+
+    a {
+      color: $c_primary;
+    }
+  }
+
+  button {
+    margin-top: rem(20);
+    width: 100%;
+    padding-block: rem(10);
+    background-color: white;
+    border-radius: rem(5);
+  }
+}

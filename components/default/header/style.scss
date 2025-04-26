@@ -20,11 +20,11 @@
     text-transform: uppercase;
 
     &:nth-of-type(2) {
-      color: $c_red;
+      color: $c_primary;
     }
 
     svg {
-      color: $c_red;
+      color: $c_primary;
       transition: color 0.3s $e_quart;
     }
   }

@@ -18,7 +18,7 @@
       gap: rem(10);
       justify-content: space-between;
       width: 100%;
-      color: $c_dark;
+      color: $c_text_primary;
 
       @include breakpoint(large) {
         font-size: rem(22);
@@ -42,7 +42,7 @@
 
     .desc {
       padding-bottom: rem(20);
-      color: $c_dark;
+      color: $c_text_primary;
 
       p {
         width: 90%;

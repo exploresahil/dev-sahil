@@ -10,6 +10,7 @@ import useResponsive from "@/hooks/useResponsive";
 import CardTilt from "@/components/animation/card-tilt/CardTilt";
 import TextHashTyping from "@/components/animation/text-hash-typing/TextHashTyping";
 import { motion, useAnimation } from "motion/react";
+import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
 
 const Skills = () => {
   const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
@@ -19,6 +20,7 @@ const Skills = () => {
   const animationRefs = useRef<any[]>([]);
 
   const { isMobile, isTablet, isDesktop } = useResponsive();
+  const shouldUseMotion = useShouldUseMotion();
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger, CustomEase);
@@ -37,7 +39,7 @@ const Skills = () => {
 
       const animation = gsap.fromTo(
         title,
-        { x: 50, opacity: 0 },
+        { x: shouldUseMotion ? 50 : 0, opacity: shouldUseMotion ? 0 : 1 },
         {
           x: 0,
           opacity: 1,
@@ -59,7 +61,11 @@ const Skills = () => {
 
       const animation = gsap.fromTo(
         skillRefs.current[categoryIndex],
-        { x: 50, y: 50, opacity: 0 },
+        {
+          x: shouldUseMotion ? 50 : 0,
+          y: shouldUseMotion ? 50 : 0,
+          opacity: shouldUseMotion ? 0 : 1,
+        },
         {
           x: 0,
           y: 0,

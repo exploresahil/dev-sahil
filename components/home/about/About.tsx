@@ -1,7 +1,10 @@
+"use client";
+
 import useResponsive from "@/hooks/useResponsive";
 import "./style.scss";
 import ParagraphGsap from "@/components/animation/paragraph-gsap/ParagraphGsap";
 import { useRef } from "react";
+import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
 
 //*----------> Text Variables
 

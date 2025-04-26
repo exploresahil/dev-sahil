@@ -2,8 +2,8 @@
 
 #Skills {
   @include full_width;
-  background-color: $c_dark;
-  color: $c_light;
+  background-color: $c_text_primary;
+  color: $c_text_secondary;
   padding-block: rem(100);
   display: flex;
   flex-direction: column;

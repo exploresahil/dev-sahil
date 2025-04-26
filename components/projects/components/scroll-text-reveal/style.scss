@@ -12,8 +12,8 @@
   .main {
     @include full_width;
     height: 300vh;
-    background-color: $c_dark;
-    color: $c_light;
+    background-color: $c_text_primary;
+    color: $c_text_secondary;
 
     .text {
       width: 100%;

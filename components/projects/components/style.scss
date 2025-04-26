@@ -27,23 +27,23 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      //background-color: $c_dark;
+      //background-color: $c_text_primary;
       border: rem(1) solid $c_gray;
       padding: rem(20) rem(20);
-      color: $c_dark;
+      color: $c_text_primary;
       font-size: rem(18);
 
       @include breakpoint(large) {
         transition: background-color 250ms $e_quart, color 250ms $e_quart,
           border 250ms $e_quart;
         &:hover {
-          border: rem(1) solid $c_light;
-          background-color: $c_red;
-          color: $c_light;
+          border: rem(1) solid $c_text_secondary;
+          background-color: $c_primary;
+          color: $c_text_secondary;
 
           .left {
             p {
-              color: $c_light;
+              color: $c_text_secondary;
             }
           }
         }
@@ -62,7 +62,7 @@
 
         p {
           font-size: rem(14);
-          color: $c_dark;
+          color: $c_text_primary;
           transition: color 250ms $e_quart;
         }
       }

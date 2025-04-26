@@ -14,13 +14,16 @@ import { projectsData } from "@/database/projects";
 import { MoveRight } from "lucide-react";
 import TextHashTyping from "@/components/animation/text-hash-typing/TextHashTyping";
 import useResponsive from "@/hooks/useResponsive";
-import Noise from "@/components/animation/noise/Noise";
 import { usePathname } from "next/navigation";
+import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
+import ImageCardTitle from "../imageCardTitle/ImageCardTitle";
 
 const Projects = () => {
   const { isDesktop } = useResponsive();
   const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const shouldUseMotion = useShouldUseMotion();
 
   useEffect(() => {
     setMounted(true);
@@ -48,16 +51,11 @@ const Projects = () => {
   return (
     <section id="Projects" style={projectsStyle}>
       <div className="left">
-        <div className="img_container" ref={imgContainerRef}>
-          <motion.img
-            src="https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=1928&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Projects cover"
-            style={{
-              scale: imgScale,
-            }}
-          />
-          <Noise />
-        </div>
+        <ImageCardTitle
+          image="https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=1928&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          ref={imgContainerRef}
+          scale={imgScale}
+        />
       </div>
       <div className="right">
         <motion.h2

@@ -2,9 +2,15 @@
 
 import { Suspense, useRef, useEffect, useState } from "react";
 import "./style.scss";
-import { motion, useScroll, useTransform } from "motion/react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "motion/react";
 import useResponsive from "@/hooks/useResponsive";
 import ParagraphGsap from "@/components/animation/paragraph-gsap/ParagraphGsap";
+import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
 
 //*----------> Text Variables
 
@@ -19,12 +25,28 @@ const sahilImg =
 const sahilimageSrcSet =
   "https://ik.imagekit.io/exploresahil/tr:w-400/image-sahil-anime.png 820w, https://ik.imagekit.io/exploresahil/tr:w-820/image-sahil-anime.png 1025w, https://ik.imagekit.io/exploresahil/tr:w-820/image-sahil-anime.png 2040w";
 
+const containerVariants = {
+  animate: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  initial: { opacity: 0, y: 50 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 const Hero = () => {
   const topRef = useRef<HTMLDivElement>(null);
   const bottomref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
   const { isMobile, isTablet, isDesktop } = useResponsive();
+
+  const shouldUseMotion = useShouldUseMotion();
+  //console.log("shouldUseMotion->", shouldUseMotion);
 
   useEffect(() => {
     setMounted(true);
@@ -83,19 +105,6 @@ const Hero = () => {
   );
   const subTitleOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
-  const containerVariants = {
-    animate: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    initial: { opacity: 0, y: 50 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
   //*----------> gsap Values
 
   const gsapStartValues = isDesktop ? "top 80%" : "top 55%";
@@ -112,7 +121,7 @@ const Hero = () => {
             initial="initial"
             animate="animate"
             style={{
-              y: yText,
+              y: shouldUseMotion ? yText : 0,
             }}
           >
             {titleArray.map((word, index) => (

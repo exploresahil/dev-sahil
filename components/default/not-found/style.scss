@@ -66,8 +66,8 @@
 
     a {
       font-family: $f_helvetica;
-      color: $c_yellow;
-      background-color: $c_dark;
+      color: $c_secondary;
+      background-color: $c_text_primary;
       padding: rem(10) rem(20);
     }
 
@@ -77,13 +77,13 @@
       }
       .animated_text {
         font-family: $f_helvetica;
-        color: $c_yellow;
-        background-color: $c_dark;
+        color: $c_secondary;
+        background-color: $c_text_primary;
         padding: rem(10) rem(20);
 
         @include breakpoint(large) {
           &:hover {
-            color: $c_red;
+            color: $c_primary;
           }
         }
       }

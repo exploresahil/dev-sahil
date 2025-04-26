@@ -10,8 +10,8 @@
 
 body {
   font-family: $f_helvetica;
-  background-color: $c_light;
-  color: $c_dark;
+  background-color: $c_text_secondary;
+  color: $c_text_primary;
   margin: 0;
   padding: 0;
 }
@@ -64,5 +64,9 @@ textarea {
 #blank,
 .blank {
   @include full_height;
-  background-color: $c_dark;
+  background-color: $c_text_primary;
+}
+
+button {
+  cursor: pointer;
 }

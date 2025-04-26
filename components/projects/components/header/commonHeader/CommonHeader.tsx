@@ -2,18 +2,24 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import "./style.scss";
 
-const DesignHeader = () => {
+type Props = {
+  title: string;
+  subTitle: string;
+  link: string;
+};
+
+const CommonHeader = ({ title, subTitle, link }: Props) => {
   return (
     <section id="DesignHeader">
       <div className="header-title">
-        <Link href="/projects">
+        <Link href={link}>
           <ArrowLeft size={20} />
-          Projects
+          {title}
         </Link>
-        <h2>Design</h2>
+        <h2>{subTitle}</h2>
       </div>
     </section>
   );
 };
 
-export default DesignHeader;
+export default CommonHeader;

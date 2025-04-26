@@ -7,7 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <CommonHeader title="Projects" subTitle="Design" link="/projects" />
+      <CommonHeader title="Home" subTitle="Reduce Animation" link="/" />
       {children}
     </>
   );

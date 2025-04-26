@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   gap: rem(20);
-  color: $c_red;
+  color: $c_primary;
 
   @include breakpoint(medium) {
     padding-block: rem(50);
@@ -29,32 +29,6 @@
 
     @include breakpoint(large) {
       padding: rem(0);
-    }
-
-    .img_container {
-      width: 100%;
-      aspect-ratio: 3 / 2;
-      border-radius: rem(10);
-      position: relative;
-      overflow: hidden;
-
-      @include breakpoint(medium) {
-        aspect-ratio: 4 / 2;
-      }
-
-      @include breakpoint(large) {
-        height: 100%;
-      }
-
-      img {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        inset: 0;
-        object-fit: cover;
-        object-position: center 70%;
-        filter: grayscale(1);
-      }
     }
   }
 
@@ -85,23 +59,23 @@
         transition: color 200ms $e_quart, padding-inline 400ms $e_quart 50ms;
 
         .block {
-          background-color: $c_red !important;
+          background-color: $c_primary !important;
         }
 
         &:hover {
-          color: $c_light;
+          color: $c_text_secondary;
           padding-inline: rem(20);
 
           a {
             .title {
               p {
-                color: $c_yellow;
+                color: $c_secondary;
               }
             }
           }
 
           .block {
-            background-color: $c_light !important;
+            background-color: $c_text_secondary !important;
           }
 
           .hover_bg {
@@ -112,7 +86,7 @@
       }
 
       .hover_bg {
-        background-color: $c_red;
+        background-color: $c_primary;
         position: absolute;
         bottom: 0;
         left: 0;
@@ -154,7 +128,7 @@
         p {
           font-family: $f_geist_mono;
           font-size: rem(12);
-          color: $c_dark;
+          color: $c_text_primary;
 
           transition: color 400ms $e_quart;
         }

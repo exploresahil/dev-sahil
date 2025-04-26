@@ -4,25 +4,26 @@
 //*-------- Colors ---------->
 //*--------
 
-$c_dark: #1d1d1f;
 $c_gray: #84837f;
-$c_light: #f5f5f7;
 //$c_green: #03c147;
 $c_green: #007500;
 //$c_blue: #5cb6eb;
 $c_blue: #008cbc;
-//$c_yellow: #fed001;
-$c_yellow: #e6c700;
-//$c_red: #d92e1c;
-$c_red: #db2f27;
-$c_pink: #dea6af;
+//$c_secondary: #fed001;
+//$c_primary: #d92e1c;
 $c_offLight: #e3e3e2;
 $c_offDark: #0a0a0a;
 $c_orange: #fe8a3d;
 $c_purple: #7649be;
 $c_seaBlue: #214287;
-$c_darkBlue: #0a369d;
-$c_lightBorder: rgba(255, 255, 255, 0.4);
+$c_text_primaryBlue: #0a369d;
+$c_text_secondaryBorder: rgba(255, 255, 255, 0.4);
+
+$c_primary: #db2f27;
+$c_secondary: #e6c700;
+$c_accent: #dea6af;
+$c_text_primary: #1d1d1f;
+$c_text_secondary: #f5f5f7;
 
 //*--------
 //*-------- Easings ---------->
@@ -62,6 +63,18 @@ $f_geist_sans: var(--font-geist-sans);
 
   @include breakpoint(xlarge) {
     padding-inline: 10vw;
+  }
+}
+
+@mixin full_margin_x {
+  margin-inline: 6vw;
+
+  @include breakpoint(large) {
+    margin-inline: 4vw;
+  }
+
+  @include breakpoint(xlarge) {
+    margin-inline: 10vw;
   }
 }
 
@@ -133,7 +146,7 @@ $f_geist_sans: var(--font-geist-sans);
         height: 100%;
         position: relative;
         z-index: 2;
-        color: $c_light;
+        color: $c_text_secondary;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
