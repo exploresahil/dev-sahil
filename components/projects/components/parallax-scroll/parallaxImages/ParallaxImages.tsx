@@ -10,10 +10,13 @@ import ImageSize from "@/utils/imageSize";
 import "./style.scss";
 import { getAnimationConfig } from "../anime";
 import { imagesDataParallaxScroll } from "../db";
+import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
 
 export function ParallaxImages() {
   const container = useRef<HTMLDivElement>(null);
   const { isMobile, isTablet, isDesktop, isXLarge } = useResponsive();
+
+const shouldUseMotion = useShouldUseMotion();
 
   const animationConfig = useMemo(
     () => getAnimationConfig({ isMobile, isTablet, isDesktop, isXLarge }),
@@ -24,7 +27,8 @@ export function ParallaxImages() {
 
   useGSAP(
     () => {
-      Object.entries(animationConfig).forEach(([className, config]) => {
+     if (shouldUseMotion) return;
+ Object.entries(animationConfig).forEach(([className, config]) => {
         const triggerOpts = {
           trigger: container.current,
           start: config.scrollTrigger.start,
