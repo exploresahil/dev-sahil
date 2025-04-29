@@ -39,6 +39,11 @@ a {
   color: inherit;
 }
 
+p {
+  text-wrap: auto;
+  text-wrap: pretty;
+}
+
 h1 {
   @include rische;
 }

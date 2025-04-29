@@ -2,12 +2,7 @@
 
 import { Suspense, useRef, useEffect, useState } from "react";
 import "./style.scss";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import useResponsive from "@/hooks/useResponsive";
 import ParagraphGsap from "@/components/animation/paragraph-gsap/ParagraphGsap";
 import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
@@ -35,7 +30,11 @@ const containerVariants = {
 
 const itemVariants = {
   initial: { opacity: 0, y: 50 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeInOut" },
+  },
 };
 
 const Hero = () => {
@@ -43,7 +42,7 @@ const Hero = () => {
   const bottomref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
-  const { isMobile, isTablet, isDesktop } = useResponsive();
+  const { isMobile, isTablet, isDesktop, isXLarge } = useResponsive();
 
   const shouldUseMotion = useShouldUseMotion();
   //console.log("shouldUseMotion->", shouldUseMotion);
@@ -75,7 +74,15 @@ const Hero = () => {
     mounted ? (isDesktop ? 500 : isTablet ? 620 : 365) : 500,
   ];
   const windowWidthValues = [
-    mounted ? (isDesktop ? "30%" : isTablet ? "60%" : "90%") : initialWidth,
+    mounted
+      ? isXLarge
+        ? "30%"
+        : isDesktop
+        ? "30%"
+        : isTablet
+        ? "60%"
+        : "90%"
+      : initialWidth,
     "100%",
   ];
   const windowHeightValues = [
@@ -156,12 +163,12 @@ const Hero = () => {
         }}
         initial={{
           opacity: 0,
-          y: 50,
+          y: 80,
         }}
         animate={{
           opacity: 1,
           y: 0,
-          transition: { duration: 0.5, delay: 0.7 },
+          transition: { duration: 0.5, delay: 0.7, ease: "easeInOut" },
         }}
       >
         {subtitle}

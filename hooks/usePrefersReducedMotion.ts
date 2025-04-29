@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
  * Returns true if animations should play (i.e., user has NOT requested reduced motion).
  */
 export function useShouldUseMotion(): boolean {
+    const [mounted, setMounted] = useState(false);
     // Initialize state based on current preference (SSR-safe)
     const [shouldUseMotion, setshouldUseMotion] = useState<boolean>(() => {
         if (typeof window === 'undefined') return true;
@@ -13,6 +14,7 @@ export function useShouldUseMotion(): boolean {
     });
 
     useEffect(() => {
+        setMounted(true);
         const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
         const handler = (event: MediaQueryListEvent) => {
             // true means user prefers reduced motion, so animations off => shouldUseMotion = false
@@ -34,5 +36,5 @@ export function useShouldUseMotion(): boolean {
         };
     }, []);
 
-    return shouldUseMotion;
+    return mounted && shouldUseMotion;
 }

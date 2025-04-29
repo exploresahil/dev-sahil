@@ -1,7 +1,7 @@
 import Noise from "@/components/animation/noise/Noise";
 import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
 import { motion, MotionValue } from "motion/react";
-import { Ref, useEffect, useRef, useState, CSSProperties } from "react";
+import { Ref, CSSProperties } from "react";
 import "./style.scss";
 
 const ImageCardTitle = ({
@@ -15,21 +15,15 @@ const ImageCardTitle = ({
   ref: Ref<HTMLDivElement> | undefined;
   style?: CSSProperties;
 }) => {
-  const [mounted, setMounted] = useState(false);
-
   const shouldUseMotion = useShouldUseMotion();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
-    <div className="img_container" ref={ref}>
+    <div className="img_card_title_container" ref={ref}>
       <motion.img
         src={image}
         alt="Projects cover"
         style={{
-          scale: mounted && shouldUseMotion ? scale : 1,
+          scale: shouldUseMotion ? scale : 1,
           ...style,
         }}
       />

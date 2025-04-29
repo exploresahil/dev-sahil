@@ -15,6 +15,7 @@ import HTML from "@/components/icon/development/HTML";
 import Javascript from "@/components/icon/development/Javascript";
 import NextJsLogo from "@/components/icon/development/NextJsLogo";
 import React from "@/components/icon/development/React";
+import SCSS from "@/components/icon/development/SCSS";
 import Typescript from "@/components/icon/development/Typescript";
 
 export type SkillItem = {
@@ -45,6 +46,10 @@ export const skillsData: SkillsData = {
                 {
                     name: "CSS",
                     component: CSS,
+                },
+                {
+                    name: "SASS",
+                    component: SCSS,
                 },
                 {
                     name: "JavaScript",

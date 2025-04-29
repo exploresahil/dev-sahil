@@ -7,8 +7,38 @@
   gap: rem(20);
   @include full_width;
 
+  @include breakpoint(medium) {
+    gap: rem(40);
+  }
+
+  @include breakpoint(large) {
+    gap: rem(20);
+  }
+
+  @include breakpoint(xxlarge) {
+    gap: rem(40);
+  }
+
   .title {
     font-size: rem(18);
+    position: relative;
+    z-index: 1;
+
+    @include breakpoint(medium) {
+      max-width: 50%;
+    }
+
+    @include breakpoint(large) {
+      max-width: 30%;
+    }
+
+    @include breakpoint(xlarge) {
+      max-width: 20%;
+    }
+
+    @include breakpoint(xxlarge) {
+      max-width: 15%;
+    }
   }
 
   .images_container {
@@ -21,6 +51,16 @@
       aspect-ratio: 1;
       position: relative;
 
+      @include breakpoint(medium) {
+        width: 70%;
+        aspect-ratio: 5 / 4;
+      }
+
+      @include breakpoint(large) {
+        width: 60%;
+        aspect-ratio: 16 / 9;
+      }
+
       &:nth-of-type(even) {
         align-self: flex-end;
       }
@@ -31,6 +71,16 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        animation: skeleton-loading 1s ease-in-out infinite alternate;
+
+        @keyframes skeleton-loading {
+          0% {
+            background-color: hsl(from $c_secondary h s l / 1);
+          }
+          100% {
+            background-color: hsl(from $c_secondary h s 75% / 1);
+          }
+        }
       }
     }
 

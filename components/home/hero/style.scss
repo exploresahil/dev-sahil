@@ -95,6 +95,11 @@
           line-height: rem(160);
           top: rem(100);
         }
+
+        @include breakpoint(xxlarge) {
+          font-size: rem(300);
+          line-height: rem(220);
+        }
       }
 
       .window {
@@ -135,6 +140,10 @@
     @include breakpoint(medium) {
       font-size: rem(25);
     }
+
+    @include breakpoint(xxlarge) {
+      font-size: rem(60);
+    }
   }
 
   .sahil_img {
@@ -160,6 +169,10 @@
       @include breakpoint(large) {
         height: 75%;
       }
+
+      @include breakpoint(xxlarge) {
+        height: 60%;
+      }
     }
   }
 
@@ -183,8 +196,13 @@
     }
 
     @include breakpoint(large) {
-      padding-top: rem(500);
+      padding-top: rem(400);
       padding-inline: 10vw;
+    }
+
+    @include breakpoint(xxlarge) {
+      padding-top: rem(600);
+      padding-inline: 16vw;
     }
 
     .bg {
@@ -214,8 +232,13 @@
       }
 
       @include breakpoint(large) {
-        font-size: rem(28);
+        font-size: rem(20);
         column-gap: rem(8);
+      }
+
+      @include breakpoint(xxlarge) {
+        font-size: rem(40);
+        column-gap: rem(10);
       }
     }
 

@@ -23,8 +23,6 @@ const Projects = () => {
   const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const shouldUseMotion = useShouldUseMotion();
-
   useEffect(() => {
     setMounted(true);
   }, []);

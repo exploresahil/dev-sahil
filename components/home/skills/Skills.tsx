@@ -7,7 +7,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
 import { useEffect, useRef, useState } from "react";
 import useResponsive from "@/hooks/useResponsive";
-import CardTilt from "@/components/animation/card-tilt/CardTilt";
 import TextHashTyping from "@/components/animation/text-hash-typing/TextHashTyping";
 import { motion, useAnimation } from "motion/react";
 import { useShouldUseMotion } from "@/hooks/usePrefersReducedMotion";
@@ -150,9 +149,7 @@ const Skills = () => {
                     skillRefs.current[categoryIndex][skillIndex] = el;
                   }}
                 >
-                  <CardTilt>
-                    <skill.component />
-                  </CardTilt>
+                  <skill.component />
                 </div>
               ))}
             </div>

@@ -1,17 +1,18 @@
 @use "@/app/(client)/scss/abstracts" as *;
 
 #Header {
-  $x: rem(80);
-  & {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: $x;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 90;
-    @include full_width;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: rem(80);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  @include full_width;
+
+  @include breakpoint(xxlarge) {
+    height: rem(100);
   }
 
   a {
@@ -23,9 +24,20 @@
       color: $c_primary;
     }
 
+    $svg_xxlarge: rem(60);
+
+    @include breakpoint(xxlarge) {
+      font-size: rem(36);
+    }
+
     svg {
       color: $c_primary;
       transition: color 0.3s $e_quart;
+
+      @include breakpoint(xxlarge) {
+        width: $svg_xxlarge;
+        height: $svg_xxlarge;
+      }
     }
   }
 

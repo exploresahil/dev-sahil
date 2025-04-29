@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Dropdown from "./dropdown/Dropdown";
 import "./style.scss";
-import { ArrowLeft } from "lucide-react";
+import { ArrowBack } from "@/components/icon/ui/Arrows";
 
 const ComponentHeader = () => {
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -28,7 +28,7 @@ const ComponentHeader = () => {
     <section id="ComponentHeader">
       <div className="header-title">
         <Link href="/projects">
-          <ArrowLeft size={20} />
+          <ArrowBack />
           Projects
         </Link>
         <h2>Components</h2>

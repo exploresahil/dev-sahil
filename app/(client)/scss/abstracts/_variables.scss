@@ -7,8 +7,7 @@
 $c_gray: #84837f;
 //$c_green: #03c147;
 $c_green: #007500;
-//$c_blue: #5cb6eb;
-$c_blue: #008cbc;
+//$c_accent: #5cb6eb;
 //$c_secondary: #fed001;
 //$c_primary: #d92e1c;
 $c_offLight: #e3e3e2;
@@ -21,7 +20,9 @@ $c_text_secondaryBorder: rgba(255, 255, 255, 0.4);
 
 $c_primary: #db2f27;
 $c_secondary: #e6c700;
-$c_accent: #dea6af;
+$c_accent_secondary: #dea6af;
+$c_accent: #008cbc;
+
 $c_text_primary: #1d1d1f;
 $c_text_secondary: #f5f5f7;
 
@@ -63,6 +64,10 @@ $f_geist_sans: var(--font-geist-sans);
 
   @include breakpoint(xlarge) {
     padding-inline: 10vw;
+  }
+
+  @include breakpoint(xxlarge) {
+    padding-inline: 16vw;
   }
 }
 

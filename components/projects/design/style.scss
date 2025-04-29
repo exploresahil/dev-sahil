@@ -60,7 +60,7 @@
         transition: background-color 250ms $e_quart, color 250ms $e_quart;
 
         &:hover {
-          background-color: $c_blue;
+          background-color: $c_accent;
           color: $c_text_secondary;
         }
       }
