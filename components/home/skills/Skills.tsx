@@ -22,6 +22,8 @@ const Skills = () => {
   const shouldUseMotion = useShouldUseMotion();
 
   useEffect(() => {
+    if (!shouldUseMotion) return;
+
     gsap.registerPlugin(ScrollTrigger, CustomEase);
 
     animationRefs.current.forEach((animation) => {
@@ -38,7 +40,7 @@ const Skills = () => {
 
       const animation = gsap.fromTo(
         title,
-        { x: shouldUseMotion ? 50 : 0, opacity: shouldUseMotion ? 0 : 1 },
+        { x: 50, opacity: 0 },
         {
           x: 0,
           opacity: 1,
@@ -61,9 +63,9 @@ const Skills = () => {
       const animation = gsap.fromTo(
         skillRefs.current[categoryIndex],
         {
-          x: shouldUseMotion ? 50 : 0,
-          y: shouldUseMotion ? 50 : 0,
-          opacity: shouldUseMotion ? 0 : 1,
+          x: 50,
+          y: 50,
+          opacity: 0,
         },
         {
           x: 0,
@@ -92,7 +94,7 @@ const Skills = () => {
       });
       animationRefs.current = [];
     };
-  }, [isMobile, isTablet, isDesktop]);
+  }, [isMobile, isTablet, isDesktop, shouldUseMotion]);
 
   const titleControls = useAnimation();
 

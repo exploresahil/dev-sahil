@@ -53,24 +53,24 @@ const baseConfig: Record<string, ImageConfig> = {
     },
 };
 
-// Adjustments for tablet viewports
+/* // Adjustments for tablet viewports
 const tabletOverrides: Partial<Record<string, Partial<ImageConfig>>> = {
     img1: { y: { from: 0, to: -30 }, objectPosition: { from: "50% 60%", to: "50% 100%" } },
     img3: { y: { from: 30, to: -10 } },
     // add more as needed...
 };
-
+ */
 
 
 export function getAnimationConfig(flags: ResponsiveFlags): Record<string, ImageConfig> {
     // Start with desktop/large defaults
     const config: Record<string, ImageConfig> = { ...baseConfig };
 
-    if (flags.isTablet) {
-        Object.entries(tabletOverrides).forEach(([key, override]) => {
-            config[key] = { ...config[key], ...override } as ImageConfig;
-        });
-    }
+    /*  if (flags.isTablet) {
+         Object.entries(tabletOverrides).forEach(([key, override]) => {
+             config[key] = { ...config[key], ...override } as ImageConfig;
+         });
+     } */
 
     // You can extend logic here for isXLarge, etc.
     return config;

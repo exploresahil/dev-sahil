@@ -5,8 +5,8 @@ type Props = {
   params: Promise<{ component: string }>;
 };
 
-const page = ({ params }: Props) => {
-  const { component: slug } = use(params);
+const page = async ({ params }: Props) => {
+  const { component: slug } = await params;
   const data = componentsData
     .filter((v: componentsType) => v.slug == slug)
     .at(0);

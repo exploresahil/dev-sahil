@@ -1,8 +1,8 @@
 export const imagesDataParallaxScroll = {
-    img1: "/parallax-scroll/parallax_scroll_01.webp",
-    img2: "/parallax-scroll/parallax_scroll_02.webp",
-    img3: "/parallax-scroll/parallax_scroll_03.webp",
-    img4: "/parallax-scroll/parallax_scroll_04.webp",
-    img5: "/parallax-scroll/parallax_scroll_05.webp",
-    img6: "/parallax-scroll/parallax_scroll_06.webp",
-};
+    img1: { img: "https://ik.imagekit.io/exploresahil/parallax_scroll_01.webp", srcSet: "https://ik.imagekit.io/exploresahil/parallax_scroll_01.webp 820w, https://ik.imagekit.io/exploresahil/parallax_scroll_01.webp 1025w, https://ik.imagekit.io/exploresahil/parallax_scroll_01.webp 2040w" },
+    img2: { img: "https://ik.imagekit.io/exploresahil/parallax_scroll_02.webp", srcSet: "https://ik.imagekit.io/exploresahil/parallax_scroll_02.webp 820w, https://ik.imagekit.io/exploresahil/parallax_scroll_02.webp 1025w, https://ik.imagekit.io/exploresahil/parallax_scroll_02.webp 2040w" },
+    img3: { img: "https://ik.imagekit.io/exploresahil/parallax_scroll_03.webp", srcSet: "https://ik.imagekit.io/exploresahil/parallax_scroll_03.webp 820w, https://ik.imagekit.io/exploresahil/parallax_scroll_03.webp 1025w, https://ik.imagekit.io/exploresahil/parallax_scroll_03.webp 2040w" },
+    img4: { img: "https://ik.imagekit.io/exploresahil/parallax_scroll_04.webp", srcSet: "https://ik.imagekit.io/exploresahil/parallax_scroll_04.webp 820w, https://ik.imagekit.io/exploresahil/parallax_scroll_04.webp 1025w, https://ik.imagekit.io/exploresahil/parallax_scroll_04.webp 2040w" },
+    img5: { img: "https://ik.imagekit.io/exploresahil/parallax_scroll_05.webp", srcSet: "https://ik.imagekit.io/exploresahil/parallax_scroll_05.webp 820w, https://ik.imagekit.io/exploresahil/parallax_scroll_05.webp 1025w, https://ik.imagekit.io/exploresahil/parallax_scroll_05.webp 2040w" },
+    img6: { img: "https://ik.imagekit.io/exploresahil/parallax_scroll_06.webp", srcSet: "https://ik.imagekit.io/exploresahil/parallax_scroll_06.webp 820w, https://ik.imagekit.io/exploresahil/parallax_scroll_06.webp 1025w, https://ik.imagekit.io/exploresahil/parallax_scroll_06.webp 2040w" },
+};  
