@@ -78,7 +78,7 @@ button {
 
 .dynamic__loading {
   margin-block: rem(20);
-  @include full_padding_x;
   font-family: $f_geist_mono;
   letter-spacing: rem(-0.15);
+  @include full_padding_x;
 }
