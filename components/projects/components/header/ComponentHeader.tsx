@@ -10,26 +10,47 @@ import { ArrowBack } from "@/components/icon/ui/Arrows";
 
 const ComponentHeader = () => {
   const [isOpen, setOpen] = useState<boolean>(false);
-  const [selectedData, setSelectedData] = useState<string>("Parallax Scroll");
+  const [selectedData, setSelectedData] = useState<string>("Website Sections");
+  const [link, setLink] = useState<{ title: string; href: string }>({
+    title: "Projects",
+    href: "/projects",
+  });
 
   const pathname = usePathname();
   const currentSlug = pathname.split("/").pop();
 
   useEffect(() => {
-    const matchingNavItem = componentsData.find(
-      (item) => item.slug === currentSlug
-    );
-    if (matchingNavItem) {
-      setSelectedData(matchingNavItem.title);
+    if (pathname === "/projects/components") {
+      setSelectedData("Website Sections");
+    } else {
+      const matchingNavItem = componentsData.find(
+        (item) => item.slug === currentSlug
+      );
+      if (matchingNavItem) {
+        setSelectedData(matchingNavItem.title);
+      }
     }
-  }, [currentSlug, componentsData]);
+  }, [pathname, currentSlug, componentsData]);
+
+  useEffect(() => {
+    if (pathname === "/projects/components") {
+      setLink({ title: "Projects", href: "/projects" });
+    } else if (componentsData.some((item) => item.slug === currentSlug)) {
+      setLink({ title: "Components", href: "/projects/components" });
+    } else {
+      setLink({ title: "Projects", href: "/projects" });
+    }
+  }, [pathname, currentSlug]);
+
+  // console.log("pathname->", pathname);
+  // console.log("link->", link);
 
   return (
     <section id="ComponentHeader">
       <div className="header-title">
-        <Link href="/projects">
+        <Link href={link.href}>
           <ArrowBack />
-          Projects
+          {link.title}
         </Link>
         <h2>Components</h2>
         <h3>{selectedData}</h3>

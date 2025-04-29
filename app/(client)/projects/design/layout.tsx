@@ -7,7 +7,12 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <CommonHeader title="Projects" subTitle="Design" link="/projects" />
+      <CommonHeader
+        title="Projects"
+        subTitle="Design"
+        link="/projects"
+        selectedData="Logo Design"
+      />
       {children}
     </>
   );

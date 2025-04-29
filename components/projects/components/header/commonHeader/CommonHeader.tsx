@@ -6,9 +6,10 @@ type Props = {
   title: string;
   subTitle: string;
   link: string;
+  selectedData: string;
 };
 
-const CommonHeader = ({ title, subTitle, link }: Props) => {
+const CommonHeader = ({ title, subTitle, link, selectedData }: Props) => {
   return (
     <section id="DesignHeader">
       <div className="header-title">
@@ -17,6 +18,7 @@ const CommonHeader = ({ title, subTitle, link }: Props) => {
           {title}
         </Link>
         <h2>{subTitle}</h2>
+        <h3>{selectedData}</h3>
       </div>
     </section>
   );

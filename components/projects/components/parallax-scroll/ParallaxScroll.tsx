@@ -9,11 +9,7 @@ const ParallaxImages = dynamic(
     import("./parallaxImages/ParallaxImages").then((mod) => mod.ParallaxImages),
   {
     ssr: false,
-    loading: () => (
-      <section id="ParallaxScroll">
-        <p>Loading...</p>
-      </section>
-    ),
+    loading: () => <p className="dynamic__loading">Loading...</p>,
   }
 );
 
@@ -21,9 +17,7 @@ export default function ParallaxScroll() {
   return (
     <section id="ParallaxScroll">
       <ProjectMotionWarning />
-      <div className="title">
-        <h1>Explore Wes Anderson Inspired Gallery</h1>
-      </div>
+
       <ParallaxImages />
     </section>
   );

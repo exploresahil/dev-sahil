@@ -24,5 +24,12 @@
     h2 {
       font-size: rem(30);
     }
+
+    h3 {
+      font-family: $f_helvetica_light;
+      text-transform: uppercase;
+      font-size: rem(16);
+      margin-top: rem(2);
+    }
   }
 }

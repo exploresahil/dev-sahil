@@ -1,5 +1,4 @@
 import { componentsData, componentsType } from "@/database/components";
-import { use } from "react";
 
 type Props = {
   params: Promise<{ component: string }>;

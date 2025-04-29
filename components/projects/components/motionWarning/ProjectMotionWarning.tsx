@@ -19,7 +19,7 @@ const ProjectMotionWarning = () => {
 
   if (!open) return null;
 
-  console.log("shouldUseMotion->", shouldUseMotion);
+  //console.log("shouldUseMotion->", shouldUseMotion);
 
   return (
     <motion.section

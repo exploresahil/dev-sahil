@@ -7,7 +7,12 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <CommonHeader title="Home" subTitle="Reduce Animation" link="/" />
+      <CommonHeader
+        title="Home"
+        subTitle="Reduce Animation"
+        link="/"
+        selectedData="Reduce Motion Sensitivity"
+      />
       {children}
     </>
   );

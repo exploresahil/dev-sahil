@@ -16,7 +16,7 @@ export function ParallaxImages() {
   const container = useRef<HTMLDivElement>(null);
   const { isMobile, isTablet, isDesktop, isXLarge } = useResponsive();
 
-const shouldUseMotion = useShouldUseMotion();
+  const shouldUseMotion = useShouldUseMotion();
 
   const animationConfig = useMemo(
     () => getAnimationConfig({ isMobile, isTablet, isDesktop, isXLarge }),
@@ -25,10 +25,13 @@ const shouldUseMotion = useShouldUseMotion();
 
   gsap.registerPlugin(ScrollTrigger);
 
+  //console.log("shouldUseMotion->", shouldUseMotion);
+
   useGSAP(
     () => {
-     if (shouldUseMotion) return;
- Object.entries(animationConfig).forEach(([className, config]) => {
+      if (!shouldUseMotion) return;
+
+      Object.entries(animationConfig).forEach(([className, config]) => {
         const triggerOpts = {
           trigger: container.current,
           start: config.scrollTrigger.start,
@@ -52,24 +55,29 @@ const shouldUseMotion = useShouldUseMotion();
         );
       });
     },
-    { scope: container }
+    { scope: container, dependencies: [shouldUseMotion] }
   );
 
   return (
-    <div className="images_container" ref={container}>
-      {Object.entries(imagesDataParallaxScroll).map(([className, src]) => (
-        <div key={className} className={`image ${className}`}>
-          <Suspense fallback={<img alt="loading" />}>
-            <img
-              src={src.img}
-              alt="wes anderson inspired"
-              sizes={ImageSize.avatar}
-              srcSet={src.srcSet}
-              loading="lazy"
-            />
-          </Suspense>
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="title">
+        <h1>Explore Wes Anderson Inspired Gallery</h1>
+      </div>
+      <div className="images_container" ref={container}>
+        {Object.entries(imagesDataParallaxScroll).map(([className, src]) => (
+          <div key={className} className={`image ${className}`}>
+            <Suspense fallback={<img alt="loading" />}>
+              <img
+                src={src.img}
+                alt="wes anderson inspired"
+                sizes={ImageSize.avatar}
+                srcSet={src.srcSet}
+                loading="lazy"
+              />
+            </Suspense>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
