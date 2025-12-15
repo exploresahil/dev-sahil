@@ -55,5 +55,6 @@ export const componentsData: componentsType[] = [
         slug: "scroll-text-reveal",
         component: ScrollTextReveal,
         description: "NEXT JS | FRAMER MOTION | CSS | SCSS | GSAP | ANIMATION"
-    }
+    },
+
 ];

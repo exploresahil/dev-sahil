@@ -10,7 +10,7 @@ const Components = () => {
       <ProjectsTitlecard
         img="https://images.unsplash.com/photo-1659469377768-4f42f2f091c5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         title="Components"
-        desc=" Our components are brought to life with a blend of React, Next.js,
+        desc="Our components are brought to life with a blend of React, Next.js,
               CSS, SCSS, and cutting-edge animation techniques. We leverage the
               power of Framer Motion, GSAP, vanilla JS, keyframes, and other
               top-tier libraries to create seamless, interactive experiences.
