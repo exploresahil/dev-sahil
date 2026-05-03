@@ -1,0 +1,299 @@
+@use "../../../../../app/(client)/scss/abstracts" as *;
+
+#AudioVisualizer {
+  @include full_width;
+  padding-top: rem(40);
+  display: flex;
+  flex-direction: column;
+  gap: rem(10);
+  position: relative;
+
+  h2 {
+    @include font_rische;
+  }
+
+  .player_container {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(large) {
+      flex-direction: row;
+    }
+  }
+
+  .uploadBtn {
+    width: fit-content;
+    height: fit-content;
+    color: $color_primary;
+    cursor: pointer;
+    border: rem(1) solid $color_default_dark;
+    padding: rem(5) rem(10);
+  }
+
+  .player {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(large) {
+      flex: 1;
+    }
+  }
+
+  .canvas_container {
+    width: 100%;
+    height: rem(320);
+    position: relative;
+    border: rem(0.5) solid $color_default_dark;
+    overflow: hidden;
+
+    @include breakpoint(medium) {
+      height: rem(380);
+    }
+
+    @include breakpoint(large) {
+      height: rem(440);
+    }
+
+    // R3F injects a <canvas> — make it fill the wrapper
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    // Loading overlay shown while WebGL context initialises
+    .canvas_loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 1;
+
+      span {
+        font-size: rem(13);
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.08em;
+        animation: canvas_pulse 1.4s ease-in-out infinite;
+      }
+    }
+  }
+
+  @keyframes canvas_pulse {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  audio {
+    display: none;
+  }
+
+  .audioBtns {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: rem(10);
+    padding: rem(5) rem(12) rem(5) rem(5);
+    border: rem(0.5) solid $color_default_dark;
+
+    .play {
+      cursor: pointer;
+      svg {
+        display: grid;
+        place-content: center;
+      }
+    }
+
+    .progress {
+      display: flex;
+      gap: rem(10);
+      font-size: 0.8rem;
+      align-items: center;
+      flex: 1;
+
+      input[type="range"] {
+        $background: $color_primary;
+        -webkit-appearance: none;
+        appearance: none;
+        background: $background;
+        cursor: pointer;
+        height: rem(5);
+        border-radius: rem(100);
+        flex: 1;
+
+        &::-webkit-slider-runnable-track {
+          background: $background;
+          height: rem(5);
+          border-radius: rem(100);
+        }
+
+        &::-moz-range-track {
+          background: $background;
+          height: rem(5);
+          border-radius: rem(100);
+        }
+
+        &::-webkit-slider-thumb {
+          $size: rem(10);
+          -webkit-appearance: none;
+          appearance: none;
+          margin-top: rem(-2.5);
+          background-color: $color_default_dark;
+          height: $size;
+          width: $size;
+          border-radius: rem(100);
+        }
+      }
+    }
+
+    .mute {
+      $size: rem(20);
+      cursor: pointer;
+
+      svg {
+        width: $size;
+        height: $size;
+        display: grid;
+        place-content: center;
+      }
+    }
+  }
+
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .settings {
+    margin-top: rem(20);
+    display: flex;
+    flex-direction: column;
+    gap: rem(20);
+
+    @include breakpoint(large) {
+      margin-top: 0;
+    }
+
+    h3 {
+      padding-bottom: rem(10);
+      border-bottom: rem(1) solid $color_default_dark;
+      @include font_rische;
+    }
+
+    .sensitivity,
+    .barColor,
+    .blur,
+    .visualMode {
+      display: flex;
+      align-items: center;
+      gap: rem(15);
+      font-size: rem(14);
+
+      input[type="range"] {
+        $background: $color_primary;
+        -webkit-appearance: none;
+        appearance: none;
+        background: $background;
+        cursor: pointer;
+        height: rem(5);
+        border-radius: rem(100);
+        width: 100%;
+
+        &::-webkit-slider-runnable-track {
+          background: $background;
+          height: rem(5);
+          border-radius: rem(100);
+        }
+
+        &::-moz-range-track {
+          background: $background;
+          height: rem(5);
+          border-radius: rem(100);
+        }
+
+        &::-webkit-slider-thumb {
+          $size: rem(10);
+          -webkit-appearance: none;
+          appearance: none;
+          margin-top: rem(-2.5);
+          background-color: $color_default_dark;
+          height: $size;
+          width: $size;
+          border-radius: rem(100);
+        }
+      }
+
+      .buttons {
+        display: flex;
+        align-items: center;
+        gap: rem(10);
+
+        button {
+          padding: rem(5) rem(10);
+          border: rem(1) solid $color_default_dark;
+          cursor: pointer;
+
+          transition:
+            color 300ms cubic-bezier(0.45, 0, 0.55, 1),
+            background 300ms cubic-bezier(0.45, 0, 0.55, 1);
+        }
+      }
+
+      .bar-active {
+        .bar {
+          background-color: $color_primary;
+          color: $color_default_light;
+          border-color: $color_primary;
+        }
+      }
+
+      .wave-active {
+        .wave {
+          background-color: $color_primary;
+          color: $color_default_light;
+          border-color: $color_primary;
+        }
+      }
+
+      .cube-active {
+        .cube {
+          background-color: $color_primary;
+          color: $color_default_light;
+          border-color: $color_primary;
+        }
+      }
+
+      input[type="color"] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        height: rem(26);
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+
+        &::-webkit-color-swatch {
+          border: none;
+        }
+
+        &::-moz-color-swatch {
+          border: none;
+        }
+      }
+    }
+
+    .bottom {
+      display: flex;
+      flex-direction: column;
+      gap: rem(20);
+    }
+  }
+}

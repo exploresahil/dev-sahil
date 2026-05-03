@@ -1,0 +1,5218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>graphify - graphify-out/graph.html</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #0f0f1a;
+        color: #e0e0e0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #graph {
+        flex: 1;
+      }
+      #sidebar {
+        width: 280px;
+        background: #1a1a2e;
+        border-left: 1px solid #2a2a4e;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      #search-wrap {
+        padding: 12px;
+        border-bottom: 1px solid #2a2a4e;
+      }
+      #search {
+        width: 100%;
+        background: #0f0f1a;
+        border: 1px solid #3a3a5e;
+        color: #e0e0e0;
+        padding: 7px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        outline: none;
+      }
+      #search:focus {
+        border-color: #4e79a7;
+      }
+      #search-results {
+        max-height: 140px;
+        overflow-y: auto;
+        padding: 4px 12px;
+        border-bottom: 1px solid #2a2a4e;
+        display: none;
+      }
+      .search-item {
+        padding: 4px 6px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .search-item:hover {
+        background: #2a2a4e;
+      }
+      #info-panel {
+        padding: 14px;
+        border-bottom: 1px solid #2a2a4e;
+        min-height: 140px;
+      }
+      #info-panel h3 {
+        font-size: 13px;
+        color: #aaa;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      #info-content {
+        font-size: 13px;
+        color: #ccc;
+        line-height: 1.6;
+      }
+      #info-content .field {
+        margin-bottom: 5px;
+      }
+      #info-content .field b {
+        color: #e0e0e0;
+      }
+      #info-content .empty {
+        color: #555;
+        font-style: italic;
+      }
+      .neighbor-link {
+        display: block;
+        padding: 2px 6px;
+        margin: 2px 0;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        border-left: 3px solid #333;
+      }
+      .neighbor-link:hover {
+        background: #2a2a4e;
+      }
+      #neighbors-list {
+        max-height: 160px;
+        overflow-y: auto;
+        margin-top: 4px;
+      }
+      #legend-wrap {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+      }
+      #legend-wrap h3 {
+        font-size: 13px;
+        color: #aaa;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      .legend-item:hover {
+        background: #2a2a4e;
+        padding-left: 4px;
+      }
+      .legend-item.dimmed {
+        opacity: 0.35;
+      }
+      .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .legend-label {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .legend-count {
+        color: #666;
+        font-size: 11px;
+      }
+      #stats {
+        padding: 10px 14px;
+        border-top: 1px solid #2a2a4e;
+        font-size: 11px;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="graph"></div>
+    <div id="sidebar">
+      <div id="search-wrap">
+        <input
+          id="search"
+          type="text"
+          placeholder="Search nodes..."
+          autocomplete="off"
+        />
+        <div id="search-results"></div>
+      </div>
+      <div id="info-panel">
+        <h3>Node Info</h3>
+        <div id="info-content">
+          <span class="empty">Click a node to inspect it</span>
+        </div>
+      </div>
+      <div id="legend-wrap">
+        <h3>Communities</h3>
+        <div id="legend"></div>
+      </div>
+      <div id="stats">202 nodes &middot; 106 edges &middot; 96 communities</div>
+    </div>
+    <script>
+      const RAW_NODES = [
+        {
+          id: "next_config_ts",
+          label: "next.config.ts",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "next.config.ts",
+          community: 64,
+          community_name: "Next Config",
+          source_file: "F:\\code\\sahil-new-in\\next.config.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "vitest_config_ts",
+          label: "vitest.config.ts",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "vitest.config.ts",
+          community: 65,
+          community_name: "Vitest Config",
+          source_file: "F:\\code\\sahil-new-in\\vitest.config.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_app_layout_tsx",
+          label: "layout.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "layout.tsx",
+          community: 2,
+          community_name: "Fonts & Layout",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\layout.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "layout_generatemetadata",
+          label: "generateMetadata()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "generateMetadata()",
+          community: 2,
+          community_name: "Fonts & Layout",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "layout_rootlayout",
+          label: "RootLayout()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 19.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "RootLayout()",
+          community: 2,
+          community_name: "Fonts & Layout",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\reduce-motion-info\\layout.tsx",
+          file_type: "code",
+          degree: 3,
+        },
+        {
+          id: "src_app_not_found_tsx",
+          label: "not-found.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "not-found.tsx",
+          community: 13,
+          community_name: "Not Found Page",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\not-found.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "not_found_notfound",
+          label: "NotFound()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "NotFound()",
+          community: 13,
+          community_name: "Not Found Page",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\not-found.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_layout_tsx",
+          label: "layout.tsx",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "layout.tsx",
+          community: 14,
+          community_name: "Client Layout",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\(client)\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "layout_clientlayout",
+          label: "ClientLayout()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ClientLayout()",
+          community: 14,
+          community_name: "Client Layout",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\(client)\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 15,
+          community_name: "Home Page",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\(client)\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "page_home",
+          label: "Home()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Home()",
+          community: 15,
+          community_name: "Home Page",
+          source_file: "F:\\code\\sahil-new-in\\src\\app\\(client)\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_projects_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 16,
+          community_name: "Projects Page",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "page_projectspage",
+          label: "ProjectsPage()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ProjectsPage()",
+          community: 16,
+          community_name: "Projects Page",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_projects_components_layout_tsx",
+          label: "layout.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "layout.tsx",
+          community: 17,
+          community_name: "Projects Components Layout",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\components\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "layout_componentlayout",
+          label: "ComponentLayout()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ComponentLayout()",
+          community: 17,
+          community_name: "Projects Components Layout",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\components\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_projects_components_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 3,
+          community_name: "Pages",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\components\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "page_page",
+          label: "page()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 25.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "page()",
+          community: 3,
+          community_name: "Pages",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\reduce-motion-info\\page.tsx",
+          file_type: "code",
+          degree: 5,
+        },
+        {
+          id: "src_app_client_projects_components_component_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 3,
+          community_name: "Pages",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\components\\[component]\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_projects_design_layout_tsx",
+          label: "layout.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "layout.tsx",
+          community: 18,
+          community_name: "Design Layout",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\design\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "layout_designlayout",
+          label: "DesignLayout()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "DesignLayout()",
+          community: 18,
+          community_name: "Design Layout",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\design\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_projects_design_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 3,
+          community_name: "Pages",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\design\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_projects_magazine_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 3,
+          community_name: "Pages",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\projects\\magazine\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_reduce_motion_info_layout_tsx",
+          label: "layout.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "layout.tsx",
+          community: 2,
+          community_name: "Fonts & Layout",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\reduce-motion-info\\layout.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_app_client_reduce_motion_info_page_tsx",
+          label: "page.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "page.tsx",
+          community: 3,
+          community_name: "Pages",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\app\\(client)\\reduce-motion-info\\page.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_animations_animated_text_animatedtext_tsx",
+          label: "AnimatedText.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AnimatedText.tsx",
+          community: 66,
+          community_name: "Animated Text",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\animated-text\\AnimatedText.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_animations_dots_grid_dotsgrid_component_tsx",
+          label: "DotsGrid.component.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 19.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "DotsGrid.component.tsx",
+          community: 8,
+          community_name: "Dots Grid",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\dots-grid\\DotsGrid.component.tsx",
+          file_type: "code",
+          degree: 3,
+        },
+        {
+          id: "dotsgrid_component_buildpattern",
+          label: "buildPattern()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "buildPattern()",
+          community: 8,
+          community_name: "Dots Grid",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\dots-grid\\DotsGrid.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "dotsgrid_component_makerovers",
+          label: "makeRovers()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "makeRovers()",
+          community: 8,
+          community_name: "Dots Grid",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\dots-grid\\DotsGrid.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "dotsgrid_component_dotsgrid",
+          label: "DotsGrid()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "DotsGrid()",
+          community: 8,
+          community_name: "Dots Grid",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\dots-grid\\DotsGrid.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_animations_noise_noise_tsx",
+          label: "Noise.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Noise.tsx",
+          community: 19,
+          community_name: "Noise Animation",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\noise\\Noise.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "noise_noise",
+          label: "Noise()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Noise()",
+          community: 19,
+          community_name: "Noise Animation",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\noise\\Noise.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_animations_paragraph_gsap_paragraphgsap_tsx",
+          label: "ParagraphGsap.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ParagraphGsap.tsx",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\paragraph-gsap\\ParagraphGsap.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "paragraphgsap_paragraphgsap",
+          label: "ParagraphGsap()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "ParagraphGsap()",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\animations\\paragraph-gsap\\ParagraphGsap.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_components_default_commonheader_commonheader_section_tsx",
+          label: "CommonHeader.section.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "CommonHeader.section.tsx",
+          community: 20,
+          community_name: "Common Header",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\commonHeader\\CommonHeader.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "commonheader_section_commonheader",
+          label: "CommonHeader()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "CommonHeader()",
+          community: 20,
+          community_name: "Common Header",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\commonHeader\\CommonHeader.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_default_footer_footer_db_ts",
+          label: "footer.db.ts",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "footer.db.ts",
+          community: 67,
+          community_name: "Footer DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\footer\\footer.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_default_footer_footer_footer_tsx",
+          label: "Footer.footer.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Footer.footer.tsx",
+          community: 21,
+          community_name: "Footer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\footer\\Footer.footer.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "footer_footer_footer",
+          label: "Footer()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Footer()",
+          community: 21,
+          community_name: "Footer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\footer\\Footer.footer.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_default_header_header_header_tsx",
+          label: "Header.header.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Header.header.tsx",
+          community: 68,
+          community_name: "Header",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\header\\Header.header.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_default_imagesection_imagesection_component_tsx",
+          label: "ImageSection.component.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ImageSection.component.tsx",
+          community: 69,
+          community_name: "Image Section",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\imageSection\\ImageSection.component.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_default_not_found_pagenotfound_section_tsx",
+          label: "PageNotFound.section.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "PageNotFound.section.tsx",
+          community: 7,
+          community_name: "Responsive & Not Found",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\not-found\\PageNotFound.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "pagenotfound_section_pagenotfound",
+          label: "PageNotFound()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "PageNotFound()",
+          community: 7,
+          community_name: "Responsive & Not Found",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\not-found\\PageNotFound.section.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_components_default_qa_qa_component_tsx",
+          label: "Qa.Component.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Qa.Component.tsx",
+          community: 22,
+          community_name: "Q&A Component",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\qa\\Qa.Component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "qa_component_handletoggle",
+          label: "handleToggle()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleToggle()",
+          community: 22,
+          community_name: "Q&A Component",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\qa\\Qa.Component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_default_socials_socials_component_tsx",
+          label: "Socials.component.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Socials.component.tsx",
+          community: 70,
+          community_name: "Socials Component",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\socials\\Socials.component.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_default_socials_socials_db_ts",
+          label: "socials.db.ts",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "socials.db.ts",
+          community: 71,
+          community_name: "Socials DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\default\\socials\\socials.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_about_homeabout_section_tsx",
+          label: "HomeAbout.section.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeAbout.section.tsx",
+          community: 72,
+          community_name: "Home About",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\about\\HomeAbout.section.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_ask_ask_db_ts",
+          label: "ask.db.ts",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ask.db.ts",
+          community: 73,
+          community_name: "Ask DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\ask\\ask.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_ask_ask_section_tsx",
+          label: "Ask.section.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Ask.section.tsx",
+          community: 23,
+          community_name: "Ask Section",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\ask\\Ask.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "ask_section_ask",
+          label: "Ask()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Ask()",
+          community: 23,
+          community_name: "Ask Section",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\ask\\Ask.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_home_hero_homehero_section_tsx",
+          label: "HomeHero.section.tsx",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeHero.section.tsx",
+          community: 24,
+          community_name: "Hero Mouse Move",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\hero\\HomeHero.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "homehero_section_handlemousemove",
+          label: "handleMouseMove()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleMouseMove()",
+          community: 24,
+          community_name: "Hero Mouse Move",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\hero\\HomeHero.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_home_hero_homeherowrapper_wrapper_tsx",
+          label: "HomeHeroWrapper.wrapper.tsx",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeHeroWrapper.wrapper.tsx",
+          community: 25,
+          community_name: "Hero Wrapper",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\hero\\HomeHeroWrapper.wrapper.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "homeherowrapper_wrapper_homeherowrapper",
+          label: "HomeHeroWrapper()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeHeroWrapper()",
+          community: 25,
+          community_name: "Hero Wrapper",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\hero\\HomeHeroWrapper.wrapper.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_home_loader_homeloader_component_tsx",
+          label: "HomeLoader.component.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeLoader.component.tsx",
+          community: 26,
+          community_name: "Home Loader",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\loader\\HomeLoader.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "homeloader_component_homeloader",
+          label: "HomeLoader()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeLoader()",
+          community: 26,
+          community_name: "Home Loader",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\loader\\HomeLoader.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_home_projects_homeprojects_section_tsx",
+          label: "HomeProjects.section.tsx",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeProjects.section.tsx",
+          community: 74,
+          community_name: "Home Projects",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\projects\\HomeProjects.section.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_projects_projects_db_ts",
+          label: "projects.db.ts",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "projects.db.ts",
+          community: 75,
+          community_name: "Projects DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\projects\\projects.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_projects_projectlinks_projectlinks_component_tsx",
+          label: "ProjectLinks.component.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ProjectLinks.component.tsx",
+          community: 27,
+          community_name: "Project Links",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\projects\\projectLinks\\ProjectLinks.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "projectlinks_component_projectlinks",
+          label: "ProjectLinks()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ProjectLinks()",
+          community: 27,
+          community_name: "Project Links",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\projects\\projectLinks\\ProjectLinks.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_home_skills_homeskills_section_tsx",
+          label: "HomeSkills.section.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HomeSkills.section.tsx",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\skills\\HomeSkills.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "homeskills_section_homeskills",
+          label: "HomeSkills()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "HomeSkills()",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\skills\\HomeSkills.section.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_components_home_skills_skills_db_ts",
+          label: "skills.db.ts",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "skills.db.ts",
+          community: 76,
+          community_name: "Skills DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\skills\\skills.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_workflow_workflow_db_ts",
+          label: "workflow.db.ts",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "workflow.db.ts",
+          community: 77,
+          community_name: "Workflow DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\workflow\\workflow.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_home_workflow_workflow_section_tsx",
+          label: "Workflow.section.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Workflow.section.tsx",
+          community: 28,
+          community_name: "Workflow",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\workflow\\Workflow.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "workflow_section_workflow",
+          label: "Workflow()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Workflow()",
+          community: 28,
+          community_name: "Workflow",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\home\\workflow\\Workflow.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobeae_icon_tsx",
+          label: "AdobeAe.icon.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeAe.icon.tsx",
+          community: 29,
+          community_name: "Adobe AE Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeAe.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobeae_icon_adobeae",
+          label: "AdobeAe()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeAe()",
+          community: 29,
+          community_name: "Adobe AE Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeAe.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobeai_icon_tsx",
+          label: "AdobeAi.icon.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeAi.icon.tsx",
+          community: 30,
+          community_name: "Adobe AI Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeAi.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobeai_icon_adobeai",
+          label: "AdobeAi()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeAi()",
+          community: 30,
+          community_name: "Adobe AI Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeAi.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobedn_icon_tsx",
+          label: "AdobeDn.icon.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeDn.icon.tsx",
+          community: 31,
+          community_name: "Adobe Dn Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeDn.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobedn_icon_adobedn",
+          label: "AdobeDn()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeDn()",
+          community: 31,
+          community_name: "Adobe Dn Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeDn.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobelrc_icon_tsx",
+          label: "AdobeLrc.icon.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeLrc.icon.tsx",
+          community: 32,
+          community_name: "Adobe Lrc Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeLrc.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobelrc_icon_adobelrc",
+          label: "AdobeLrc()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeLrc()",
+          community: 32,
+          community_name: "Adobe Lrc Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeLrc.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobepr_icon_tsx",
+          label: "AdobePr.icon.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobePr.icon.tsx",
+          community: 33,
+          community_name: "Adobe Pr Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobePr.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobepr_icon_adobepr",
+          label: "AdobePr()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobePr()",
+          community: 33,
+          community_name: "Adobe Pr Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobePr.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobeps_icon_tsx",
+          label: "AdobePs.icon.tsx",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobePs.icon.tsx",
+          community: 34,
+          community_name: "Adobe Ps Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobePs.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobeps_icon_adobeps",
+          label: "AdobePs()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobePs()",
+          community: 34,
+          community_name: "Adobe Ps Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobePs.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_adobexd_icon_tsx",
+          label: "AdobeXd.icon.tsx",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeXd.icon.tsx",
+          community: 35,
+          community_name: "Adobe Xd Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeXd.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "adobexd_icon_adobexd",
+          label: "AdobeXd()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "AdobeXd()",
+          community: 35,
+          community_name: "Adobe Xd Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\AdobeXd.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_blender_icon_tsx",
+          label: "Blender.icon.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Blender.icon.tsx",
+          community: 36,
+          community_name: "Blender Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\Blender.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "blender_icon_blender",
+          label: "Blender()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Blender()",
+          community: 36,
+          community_name: "Blender Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\Blender.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_creative_figma_icon_tsx",
+          label: "Figma.icon.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Figma.icon.tsx",
+          community: 37,
+          community_name: "Figma Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\Figma.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "figma_icon_figma",
+          label: "Figma()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Figma()",
+          community: 37,
+          community_name: "Figma Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\creative\\Figma.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_angular_icon_tsx",
+          label: "Angular.icon.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Angular.icon.tsx",
+          community: 78,
+          community_name: "Angular Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Angular.icon.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_icon_development_apollographql_icon_tsx",
+          label: "ApolloGraphQl.icon.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ApolloGraphQl.icon.tsx",
+          community: 38,
+          community_name: "Apollo GraphQL Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\ApolloGraphQl.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "apollographql_icon_apollographqllogo",
+          label: "ApolloGraphQlLogo()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ApolloGraphQlLogo()",
+          community: 38,
+          community_name: "Apollo GraphQL Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\ApolloGraphQl.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_css_icon_tsx",
+          label: "CSS.icon.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "CSS.icon.tsx",
+          community: 39,
+          community_name: "CSS Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\CSS.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "css_icon_css",
+          label: "CSS()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "CSS()",
+          community: 39,
+          community_name: "CSS Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\CSS.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_framermotion_icon_tsx",
+          label: "FramerMotion.icon.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "FramerMotion.icon.tsx",
+          community: 40,
+          community_name: "Framer Motion Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\FramerMotion.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "framermotion_icon_framermotionlogo",
+          label: "FramerMotionLogo()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "FramerMotionLogo()",
+          community: 40,
+          community_name: "Framer Motion Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\FramerMotion.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_gsap_icon_tsx",
+          label: "GSAP.icon.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "GSAP.icon.tsx",
+          community: 41,
+          community_name: "GSAP Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\GSAP.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "gsap_icon_gsap",
+          label: "GSAP()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "GSAP()",
+          community: 41,
+          community_name: "GSAP Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\GSAP.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_html_icon_tsx",
+          label: "HTML.icon.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HTML.icon.tsx",
+          community: 42,
+          community_name: "HTML Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\HTML.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "html_icon_html",
+          label: "HTML()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HTML()",
+          community: 42,
+          community_name: "HTML Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\HTML.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_javascript_icon_tsx",
+          label: "Javascript.icon.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Javascript.icon.tsx",
+          community: 43,
+          community_name: "JavaScript Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Javascript.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "javascript_icon_javascript",
+          label: "Javascript()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Javascript()",
+          community: 43,
+          community_name: "JavaScript Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Javascript.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_nextjs_icon_tsx",
+          label: "NextJs.icon.tsx",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "NextJs.icon.tsx",
+          community: 44,
+          community_name: "Next.js Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\NextJs.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "nextjs_icon_nextjslogo",
+          label: "NextJsLogo()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "NextJsLogo()",
+          community: 44,
+          community_name: "Next.js Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\NextJs.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_node_icon_tsx",
+          label: "Node.icon.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Node.icon.tsx",
+          community: 79,
+          community_name: "Node Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Node.icon.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_icon_development_react_icon_tsx",
+          label: "React.icon.tsx",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "React.icon.tsx",
+          community: 45,
+          community_name: "React Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\React.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "react_icon_react",
+          label: "React()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "React()",
+          community: 45,
+          community_name: "React Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\React.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_scss_icon_tsx",
+          label: "SCSS.icon.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "SCSS.icon.tsx",
+          community: 46,
+          community_name: "SCSS Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\SCSS.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "scss_icon_scss",
+          label: "SCSS()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "SCSS()",
+          community: 46,
+          community_name: "SCSS Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\SCSS.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_development_three_icon_tsx",
+          label: "Three.icon.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Three.icon.tsx",
+          community: 80,
+          community_name: "Three.js Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Three.icon.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_icon_development_typescript_icon_tsx",
+          label: "Typescript.icon.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Typescript.icon.tsx",
+          community: 47,
+          community_name: "TypeScript Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Typescript.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "typescript_icon_typescript",
+          label: "Typescript()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Typescript()",
+          community: 47,
+          community_name: "TypeScript Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\development\\Typescript.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_logo_logo_icon_tsx",
+          label: "Logo.icon.tsx",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Logo.icon.tsx",
+          community: 48,
+          community_name: "Logo Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\logo\\Logo.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "logo_icon_logo",
+          label: "Logo()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Logo()",
+          community: 48,
+          community_name: "Logo Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\logo\\Logo.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_social_behance_icon_tsx",
+          label: "Behance.icon.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Behance.icon.tsx",
+          community: 49,
+          community_name: "Behance Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\Behance.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "behance_icon_behance",
+          label: "Behance()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Behance()",
+          community: 49,
+          community_name: "Behance Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\Behance.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_social_frontendmentor_icon_tsx",
+          label: "FrontendMentor.icon.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "FrontendMentor.icon.tsx",
+          community: 50,
+          community_name: "Frontend Mentor Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\FrontendMentor.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "frontendmentor_icon_frontendmentor",
+          label: "FrontendMentor()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "FrontendMentor()",
+          community: 50,
+          community_name: "Frontend Mentor Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\FrontendMentor.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_social_github_icon_tsx",
+          label: "Github.icon.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Github.icon.tsx",
+          community: 51,
+          community_name: "GitHub Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\Github.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "github_icon_github",
+          label: "Github()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Github()",
+          community: 51,
+          community_name: "GitHub Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\Github.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_social_linkedin_icon_tsx",
+          label: "LinkedIn.icon.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "LinkedIn.icon.tsx",
+          community: 52,
+          community_name: "LinkedIn Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\LinkedIn.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "linkedin_icon_linkedin",
+          label: "LinkedIn()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "LinkedIn()",
+          community: 52,
+          community_name: "LinkedIn Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\social\\LinkedIn.icon.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_star_star_tsx",
+          label: "Star.tsx",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Star.tsx",
+          community: 53,
+          community_name: "Star Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\star\\Star.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "star_star",
+          label: "Star()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Star()",
+          community: 53,
+          community_name: "Star Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\star\\Star.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_icon_ui_arrows_icons_tsx",
+          label: "Arrows.icons.tsx",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 22.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "Arrows.icons.tsx",
+          community: 5,
+          community_name: "Arrow Icons",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\ui\\Arrows.icons.tsx",
+          file_type: "code",
+          degree: 4,
+        },
+        {
+          id: "arrows_icons_arrownext",
+          label: "ArrowNext()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ArrowNext()",
+          community: 5,
+          community_name: "Arrow Icons",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\ui\\Arrows.icons.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "arrows_icons_arrowback",
+          label: "ArrowBack()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ArrowBack()",
+          community: 5,
+          community_name: "Arrow Icons",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\ui\\Arrows.icons.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "arrows_icons_arrowup",
+          label: "ArrowUp()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ArrowUp()",
+          community: 5,
+          community_name: "Arrow Icons",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\ui\\Arrows.icons.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "arrows_icons_arrowdown",
+          label: "ArrowDown()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ArrowDown()",
+          community: 5,
+          community_name: "Arrow Icons",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\icon\\ui\\Arrows.icons.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_components_component_tsx",
+          label: "Components.component.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Components.component.tsx",
+          community: 81,
+          community_name: "Components",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\Components.component.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_components_components_db_ts",
+          label: "components.db.ts",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "components.db.ts",
+          community: 82,
+          community_name: "Components DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\components.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_components_componentheader_componenthearder_section_tsx",
+          label: "ComponentHearder.section.tsx",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ComponentHearder.section.tsx",
+          community: 54,
+          community_name: "Component Header",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\componentHeader\\ComponentHearder.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "componenthearder_section_componenthearder",
+          label: "ComponentHearder()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ComponentHearder()",
+          community: 54,
+          community_name: "Component Header",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\componentHeader\\ComponentHearder.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_componentheader_menu_menu_anim_ts",
+          label: "menu.anim.ts",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "menu.anim.ts",
+          community: 83,
+          community_name: "Menu Animation",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\componentHeader\\menu\\menu.anim.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_components_componentheader_menu_menu_component_tsx",
+          label: "Menu.component.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "Menu.component.tsx",
+          community: 9,
+          community_name: "Menu Component",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\componentHeader\\menu\\Menu.component.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "menu_component_handleitemclick",
+          label: "handleItemClick()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleItemClick()",
+          community: 9,
+          community_name: "Menu Component",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\componentHeader\\menu\\Menu.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "menu_component_handleclose",
+          label: "handleClose()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleClose()",
+          community: 9,
+          community_name: "Menu Component",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\componentHeader\\menu\\Menu.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          label: "AudioVisualizer.section.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 40.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "AudioVisualizer.section.tsx",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 10,
+        },
+        {
+          id: "audiovisualizer_section_bars",
+          label: "Bars()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Bars()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_onplay",
+          label: "onPlay()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "onPlay()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_onpause",
+          label: "onPause()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "onPause()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_onended",
+          label: "onEnded()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "onEnded()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_ontimeupdate",
+          label: "onTimeUpdate()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "onTimeUpdate()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_onmetadata",
+          label: "onMetadata()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "onMetadata()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_handlefileupload",
+          label: "handleFileUpload()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleFileUpload()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_toggleplay",
+          label: "togglePlay()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "togglePlay()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_togglemute",
+          label: "toggleMute()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "toggleMute()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "audiovisualizer_section_formattime",
+          label: "formatTime()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "formatTime()",
+          community: 0,
+          community_name: "Audio Visualizer",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\audioVisualizer\\AudioVisualizer.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_hoverimageslidemenu_hoverimageslidemenu_section_tsx",
+          label: "HoverImageSlideMenu.section.tsx",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HoverImageSlideMenu.section.tsx",
+          community: 55,
+          community_name: "Hover Image Slide Menu",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\hoverImageSlideMenu\\HoverImageSlideMenu.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "hoverimageslidemenu_section_hoverimageslidemenu",
+          label: "HoverImageSlideMenu()",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "HoverImageSlideMenu()",
+          community: 55,
+          community_name: "Hover Image Slide Menu",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\hoverImageSlideMenu\\HoverImageSlideMenu.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_hoverimageslidemenu_teammember_db_ts",
+          label: "teamMember.db.ts",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "teamMember.db.ts",
+          community: 84,
+          community_name: "Team Member DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\hoverImageSlideMenu\\teamMember.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_components_sections_maskcursoreffect_maskcursoreffect_section_tsx",
+          label: "MaskCursorEffect.section.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "MaskCursorEffect.section.tsx",
+          community: 56,
+          community_name: "Mask Cursor Effect",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\maskCursorEffect\\MaskCursorEffect.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "maskcursoreffect_section_maskcursoreffect",
+          label: "MaskCursorEffect()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "MaskCursorEffect()",
+          community: 56,
+          community_name: "Mask Cursor Effect",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\maskCursorEffect\\MaskCursorEffect.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_menus_menus_section_tsx",
+          label: "Menus.section.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Menus.section.tsx",
+          community: 57,
+          community_name: "Menus Section",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\menus\\Menus.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "menus_section_menus",
+          label: "Menus()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Menus()",
+          community: 57,
+          community_name: "Menus Section",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\menus\\Menus.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_parallaxscroll_parallaxconfig_anim_ts",
+          label: "parallaxConfig.anim.ts",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "parallaxConfig.anim.ts",
+          community: 58,
+          community_name: "Parallax Config",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\parallaxConfig.anim.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "parallaxconfig_anim_getanimationconfig",
+          label: "getAnimationConfig()",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "getAnimationConfig()",
+          community: 58,
+          community_name: "Parallax Config",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\parallaxConfig.anim.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_parallaxscroll_parallaximages_component_tsx",
+          label: "ParallaxImages.component.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ParallaxImages.component.tsx",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\ParallaxImages.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "parallaximages_component_parallaximages",
+          label: "ParallaxImages()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "ParallaxImages()",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\ParallaxImages.component.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_components_projects_components_sections_parallaxscroll_parallaximages_db_ts",
+          label: "parallaxImages.db.ts",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "parallaxImages.db.ts",
+          community: 85,
+          community_name: "Parallax Images DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\parallaxImages.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_components_sections_parallaxscroll_parallaxscroll_section_tsx",
+          label: "ParallaxScroll.section.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ParallaxScroll.section.tsx",
+          community: 59,
+          community_name: "Parallax Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\ParallaxScroll.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "parallaxscroll_section_parallaxscroll",
+          label: "ParallaxScroll()",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ParallaxScroll()",
+          community: 59,
+          community_name: "Parallax Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\ParallaxScroll.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_pixelcursormove_pixelcursormove_section_tsx",
+          label: "PixelCursorMove.section.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "PixelCursorMove.section.tsx",
+          community: 60,
+          community_name: "Pixel Cursor Move",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\pixelCursorMove\\PixelCursorMove.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "pixelcursormove_section_pixelcursormove",
+          label: "PixelCursorMove()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "PixelCursorMove()",
+          community: 60,
+          community_name: "Pixel Cursor Move",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\pixelCursorMove\\PixelCursorMove.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_projects_components_sections_scrolltextreveal_scrolltextreveal_section_tsx",
+          label: "ScrollTextReveal.section.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ScrollTextReveal.section.tsx",
+          community: 86,
+          community_name: "Scroll Text Reveal",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\scrollTextReveal\\ScrollTextReveal.section.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_components_warning_projectwarning_tsx",
+          label: "ProjectWarning.tsx",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ProjectWarning.tsx",
+          community: 87,
+          community_name: "Project Warning",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\warning\\ProjectWarning.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_design_design_db_ts",
+          label: "design.db.ts",
+          color: {
+            background: "#9C755F",
+            border: "#9C755F",
+            highlight: { background: "#ffffff", border: "#9C755F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "design.db.ts",
+          community: 88,
+          community_name: "Design DB",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\design\\design.db.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_design_design_section_tsx",
+          label: "Design.section.tsx",
+          color: {
+            background: "#BAB0AC",
+            border: "#BAB0AC",
+            highlight: { background: "#ffffff", border: "#BAB0AC" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "Design.section.tsx",
+          community: 89,
+          community_name: "Design Section",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\design\\Design.section.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_projects_projectstitlecard_projectstitlecard_component_tsx",
+          label: "ProjectsTitlecard.component.tsx",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ProjectsTitlecard.component.tsx",
+          community: 61,
+          community_name: "Projects Title Card",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\projectsTitleCard\\ProjectsTitlecard.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "projectstitlecard_component_projectstitlecard",
+          label: "ProjectsTitlecard()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "ProjectsTitlecard()",
+          community: 61,
+          community_name: "Projects Title Card",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\projects\\projectsTitleCard\\ProjectsTitlecard.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_svg_sahilsatpute_icon_tsx",
+          label: "SahilSatpute.icon.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "SahilSatpute.icon.tsx",
+          community: 90,
+          community_name: "Sahil Satpute Icon",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\svg\\SahilSatpute.icon.tsx",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_warnings_motion_motionwarning_modal_tsx",
+          label: "MotionWarning.modal.tsx",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "MotionWarning.modal.tsx",
+          community: 10,
+          community_name: "Motion Warning",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\warnings\\motion\\MotionWarning.modal.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "motionwarning_modal_handlebackdropclick",
+          label: "handleBackdropClick()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleBackdropClick()",
+          community: 10,
+          community_name: "Motion Warning",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\warnings\\motion\\MotionWarning.modal.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "motionwarning_modal_handlekeydown",
+          label: "handleKeyDown()",
+          color: {
+            background: "#4E79A7",
+            border: "#4E79A7",
+            highlight: { background: "#ffffff", border: "#4E79A7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "handleKeyDown()",
+          community: 10,
+          community_name: "Motion Warning",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\warnings\\motion\\MotionWarning.modal.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_components_warnings_motionpage_motioninfo_data_ts",
+          label: "motionInfo.data.ts",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "motionInfo.data.ts",
+          community: 91,
+          community_name: "Motion Info Data",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\warnings\\motionPage\\motionInfo.data.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_components_warnings_motionpage_motionpage_section_tsx",
+          label: "MotionPage.section.tsx",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "MotionPage.section.tsx",
+          community: 62,
+          community_name: "Motion Page",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\warnings\\motionPage\\MotionPage.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "motionpage_section_motionpage",
+          label: "MotionPage()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "MotionPage()",
+          community: 62,
+          community_name: "Motion Page",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\components\\warnings\\motionPage\\MotionPage.section.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_context_pagetransition_pagetransition_context_tsx",
+          label: "PageTransition.context.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "PageTransition.context.tsx",
+          community: 6,
+          community_name: "Page Transitions",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\context\\pageTransition\\PageTransition.context.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "pagetransition_context_resolvehref",
+          label: "resolveHref()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "resolveHref()",
+          community: 6,
+          community_name: "Page Transitions",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\context\\pageTransition\\PageTransition.context.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "pagetransition_context_usepagetransitioncontext",
+          label: "usePageTransitionContext()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "usePageTransitionContext()",
+          community: 6,
+          community_name: "Page Transitions",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\context\\pageTransition\\PageTransition.context.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_context_transitionlink_transitionlink_component_tsx",
+          label: "TransitionLink.component.tsx",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "TransitionLink.component.tsx",
+          community: 6,
+          community_name: "Page Transitions",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\context\\transitionLink\\TransitionLink.component.tsx",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "transitionlink_component_transitionlink",
+          label: "TransitionLink()",
+          color: {
+            background: "#B07AA1",
+            border: "#B07AA1",
+            highlight: { background: "#ffffff", border: "#B07AA1" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "TransitionLink()",
+          community: 6,
+          community_name: "Page Transitions",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\context\\transitionLink\\TransitionLink.component.tsx",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_hooks_usebrowser_hook_ts",
+          label: "useBrowser.hook.ts",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useBrowser.hook.ts",
+          community: 11,
+          community_name: "Browser Detection",
+          source_file: "F:\\code\\sahil-new-in\\src\\hooks\\useBrowser.hook.ts",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "usebrowser_hook_detectbrowserfromua",
+          label: "detectBrowserFromUA()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "detectBrowserFromUA()",
+          community: 11,
+          community_name: "Browser Detection",
+          source_file: "F:\\code\\sahil-new-in\\src\\hooks\\useBrowser.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "usebrowser_hook_usebrowser",
+          label: "useBrowser()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "useBrowser()",
+          community: 11,
+          community_name: "Browser Detection",
+          source_file: "F:\\code\\sahil-new-in\\src\\hooks\\useBrowser.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_hooks_uselenisscrollto_hook_ts",
+          label: "useLenisScrollTo.hook.ts",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 25.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useLenisScrollTo.hook.ts",
+          community: 4,
+          community_name: "Lenis Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useLenisScrollTo.hook.ts",
+          file_type: "code",
+          degree: 5,
+        },
+        {
+          id: "uselenisscrollto_hook_easein",
+          label: "easeIn()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "easeIn()",
+          community: 4,
+          community_name: "Lenis Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useLenisScrollTo.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "uselenisscrollto_hook_easeout",
+          label: "easeOut()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "easeOut()",
+          community: 4,
+          community_name: "Lenis Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useLenisScrollTo.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "uselenisscrollto_hook_easeinout",
+          label: "easeInOut()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "easeInOut()",
+          community: 4,
+          community_name: "Lenis Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useLenisScrollTo.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "uselenisscrollto_hook_linear",
+          label: "linear()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "linear()",
+          community: 4,
+          community_name: "Lenis Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useLenisScrollTo.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "uselenisscrollto_hook_uselenisscrollto",
+          label: "useLenisScrollTo()",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "useLenisScrollTo()",
+          community: 4,
+          community_name: "Lenis Scroll",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useLenisScrollTo.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_hooks_useprefersreducedmotion_hook_ts",
+          label: "usePrefersReducedMotion.hook.ts",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "usePrefersReducedMotion.hook.ts",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\usePrefersReducedMotion.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "useprefersreducedmotion_hook_useshouldusemotion",
+          label: "useShouldUseMotion()",
+          color: {
+            background: "#F28E2B",
+            border: "#F28E2B",
+            highlight: { background: "#ffffff", border: "#F28E2B" },
+          },
+          size: 22.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useShouldUseMotion()",
+          community: 1,
+          community_name: "Animation & Motion",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\usePrefersReducedMotion.hook.ts",
+          file_type: "code",
+          degree: 4,
+        },
+        {
+          id: "src_hooks_useresponsive_hook_ts",
+          label: "useResponsive.hook.ts",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useResponsive.hook.ts",
+          community: 7,
+          community_name: "Responsive & Not Found",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useResponsive.hook.ts",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "useresponsive_hook_getbreakpoint",
+          label: "getBreakpoint()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "getBreakpoint()",
+          community: 7,
+          community_name: "Responsive & Not Found",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useResponsive.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "useresponsive_hook_useresponsive",
+          label: "useResponsive()",
+          color: {
+            background: "#FF9DA7",
+            border: "#FF9DA7",
+            highlight: { background: "#ffffff", border: "#FF9DA7" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useResponsive()",
+          community: 7,
+          community_name: "Responsive & Not Found",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useResponsive.hook.ts",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_hooks_usewarningstore_hook_ts",
+          label: "useWarningStore.hook.ts",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useWarningStore.hook.ts",
+          community: 12,
+          community_name: "Warning Store",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useWarningStore.hook.ts",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "usewarningstore_hook_getnextmidnight",
+          label: "getNextMidnight()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "getNextMidnight()",
+          community: 12,
+          community_name: "Warning Store",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useWarningStore.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "usewarningstore_hook_expiringstorage",
+          label: "expiringStorage()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "expiringStorage()",
+          community: 12,
+          community_name: "Warning Store",
+          source_file:
+            "F:\\code\\sahil-new-in\\src\\hooks\\useWarningStore.hook.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "src_test_setup_ts",
+          label: "setup.ts",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "setup.ts",
+          community: 92,
+          community_name: "Test Setup",
+          source_file: "F:\\code\\sahil-new-in\\src\\test\\setup.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_utils_colors_utils_ts",
+          label: "colors.utils.ts",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "colors.utils.ts",
+          community: 93,
+          community_name: "Colors Utility",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\colors.utils.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_utils_fonts_util_ts",
+          label: "fonts.util.ts",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "fonts.util.ts",
+          community: 2,
+          community_name: "Fonts & Layout",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\fonts.util.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "fonts_util_usefonts",
+          label: "useFonts()",
+          color: {
+            background: "#E15759",
+            border: "#E15759",
+            highlight: { background: "#ffffff", border: "#E15759" },
+          },
+          size: 16.0,
+          font: { size: 12, color: "#ffffff" },
+          title: "useFonts()",
+          community: 2,
+          community_name: "Fonts & Layout",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\fonts.util.ts",
+          file_type: "code",
+          degree: 2,
+        },
+        {
+          id: "src_utils_image_util_ts",
+          label: "image.util.ts",
+          color: {
+            background: "#59A14F",
+            border: "#59A14F",
+            highlight: { background: "#ffffff", border: "#59A14F" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "image.util.ts",
+          community: 94,
+          community_name: "Image Utility",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\image.util.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_utils_index_util_ts",
+          label: "index.util.ts",
+          color: {
+            background: "#EDC948",
+            border: "#EDC948",
+            highlight: { background: "#ffffff", border: "#EDC948" },
+          },
+          size: 10.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "index.util.ts",
+          community: 95,
+          community_name: "Index Utility",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\index.util.ts",
+          file_type: "code",
+          degree: 0,
+        },
+        {
+          id: "src_utils_pxtorem_util_ts",
+          label: "pxToRem.util.ts",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "pxToRem.util.ts",
+          community: 63,
+          community_name: "Px to Rem Utility",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\pxToRem.util.ts",
+          file_type: "code",
+          degree: 1,
+        },
+        {
+          id: "pxtorem_util_pxtorem",
+          label: "pxToRem()",
+          color: {
+            background: "#76B7B2",
+            border: "#76B7B2",
+            highlight: { background: "#ffffff", border: "#76B7B2" },
+          },
+          size: 13.0,
+          font: { size: 0, color: "#ffffff" },
+          title: "pxToRem()",
+          community: 63,
+          community_name: "Px to Rem Utility",
+          source_file: "F:\\code\\sahil-new-in\\src\\utils\\pxToRem.util.ts",
+          file_type: "code",
+          degree: 1,
+        },
+      ];
+      const RAW_EDGES = [
+        {
+          from: "src_app_layout_tsx",
+          to: "layout_generatemetadata",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_layout_tsx",
+          to: "layout_rootlayout",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "layout_rootlayout",
+          to: "src_app_client_reduce_motion_info_layout_tsx",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "layout_rootlayout",
+          to: "fonts_util_usefonts",
+          label: "calls",
+          title: "calls [INFERRED]",
+          dashes: true,
+          width: 1,
+          color: { opacity: 0.35 },
+          confidence: "INFERRED",
+        },
+        {
+          from: "src_app_not_found_tsx",
+          to: "not_found_notfound",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_client_layout_tsx",
+          to: "layout_clientlayout",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_client_page_tsx",
+          to: "page_home",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_client_projects_page_tsx",
+          to: "page_projectspage",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_client_projects_components_layout_tsx",
+          to: "layout_componentlayout",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_client_projects_components_page_tsx",
+          to: "page_page",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "page_page",
+          to: "src_app_client_projects_components_component_page_tsx",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "page_page",
+          to: "src_app_client_projects_design_page_tsx",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "page_page",
+          to: "src_app_client_projects_magazine_page_tsx",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "page_page",
+          to: "src_app_client_reduce_motion_info_page_tsx",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_app_client_projects_design_layout_tsx",
+          to: "layout_designlayout",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_animations_dots_grid_dotsgrid_component_tsx",
+          to: "dotsgrid_component_buildpattern",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_animations_dots_grid_dotsgrid_component_tsx",
+          to: "dotsgrid_component_makerovers",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_animations_dots_grid_dotsgrid_component_tsx",
+          to: "dotsgrid_component_dotsgrid",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_animations_noise_noise_tsx",
+          to: "noise_noise",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_animations_paragraph_gsap_paragraphgsap_tsx",
+          to: "paragraphgsap_paragraphgsap",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "paragraphgsap_paragraphgsap",
+          to: "useprefersreducedmotion_hook_useshouldusemotion",
+          label: "calls",
+          title: "calls [INFERRED]",
+          dashes: true,
+          width: 1,
+          color: { opacity: 0.35 },
+          confidence: "INFERRED",
+        },
+        {
+          from: "src_components_default_commonheader_commonheader_section_tsx",
+          to: "commonheader_section_commonheader",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_default_footer_footer_footer_tsx",
+          to: "footer_footer_footer",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_default_not_found_pagenotfound_section_tsx",
+          to: "pagenotfound_section_pagenotfound",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "pagenotfound_section_pagenotfound",
+          to: "useresponsive_hook_useresponsive",
+          label: "calls",
+          title: "calls [INFERRED]",
+          dashes: true,
+          width: 1,
+          color: { opacity: 0.35 },
+          confidence: "INFERRED",
+        },
+        {
+          from: "src_components_default_qa_qa_component_tsx",
+          to: "qa_component_handletoggle",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_home_ask_ask_section_tsx",
+          to: "ask_section_ask",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_home_hero_homehero_section_tsx",
+          to: "homehero_section_handlemousemove",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_home_hero_homeherowrapper_wrapper_tsx",
+          to: "homeherowrapper_wrapper_homeherowrapper",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_home_loader_homeloader_component_tsx",
+          to: "homeloader_component_homeloader",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_home_projects_projectlinks_projectlinks_component_tsx",
+          to: "projectlinks_component_projectlinks",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_home_skills_homeskills_section_tsx",
+          to: "homeskills_section_homeskills",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "homeskills_section_homeskills",
+          to: "useprefersreducedmotion_hook_useshouldusemotion",
+          label: "calls",
+          title: "calls [INFERRED]",
+          dashes: true,
+          width: 1,
+          color: { opacity: 0.35 },
+          confidence: "INFERRED",
+        },
+        {
+          from: "src_components_home_workflow_workflow_section_tsx",
+          to: "workflow_section_workflow",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobeae_icon_tsx",
+          to: "adobeae_icon_adobeae",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobeai_icon_tsx",
+          to: "adobeai_icon_adobeai",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobedn_icon_tsx",
+          to: "adobedn_icon_adobedn",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobelrc_icon_tsx",
+          to: "adobelrc_icon_adobelrc",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobepr_icon_tsx",
+          to: "adobepr_icon_adobepr",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobeps_icon_tsx",
+          to: "adobeps_icon_adobeps",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_adobexd_icon_tsx",
+          to: "adobexd_icon_adobexd",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_blender_icon_tsx",
+          to: "blender_icon_blender",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_creative_figma_icon_tsx",
+          to: "figma_icon_figma",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_apollographql_icon_tsx",
+          to: "apollographql_icon_apollographqllogo",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_css_icon_tsx",
+          to: "css_icon_css",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_framermotion_icon_tsx",
+          to: "framermotion_icon_framermotionlogo",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_gsap_icon_tsx",
+          to: "gsap_icon_gsap",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_html_icon_tsx",
+          to: "html_icon_html",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_javascript_icon_tsx",
+          to: "javascript_icon_javascript",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_nextjs_icon_tsx",
+          to: "nextjs_icon_nextjslogo",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_react_icon_tsx",
+          to: "react_icon_react",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_scss_icon_tsx",
+          to: "scss_icon_scss",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_development_typescript_icon_tsx",
+          to: "typescript_icon_typescript",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_logo_logo_icon_tsx",
+          to: "logo_icon_logo",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_social_behance_icon_tsx",
+          to: "behance_icon_behance",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_social_frontendmentor_icon_tsx",
+          to: "frontendmentor_icon_frontendmentor",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_social_github_icon_tsx",
+          to: "github_icon_github",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_social_linkedin_icon_tsx",
+          to: "linkedin_icon_linkedin",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_star_star_tsx",
+          to: "star_star",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_ui_arrows_icons_tsx",
+          to: "arrows_icons_arrownext",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_ui_arrows_icons_tsx",
+          to: "arrows_icons_arrowback",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_ui_arrows_icons_tsx",
+          to: "arrows_icons_arrowup",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_icon_ui_arrows_icons_tsx",
+          to: "arrows_icons_arrowdown",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_componentheader_componenthearder_section_tsx",
+          to: "componenthearder_section_componenthearder",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_componentheader_menu_menu_component_tsx",
+          to: "menu_component_handleitemclick",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_componentheader_menu_menu_component_tsx",
+          to: "menu_component_handleclose",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_bars",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_onplay",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_onpause",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_onended",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_ontimeupdate",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_onmetadata",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_handlefileupload",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_toggleplay",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_togglemute",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx",
+          to: "audiovisualizer_section_formattime",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_hoverimageslidemenu_hoverimageslidemenu_section_tsx",
+          to: "hoverimageslidemenu_section_hoverimageslidemenu",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_maskcursoreffect_maskcursoreffect_section_tsx",
+          to: "maskcursoreffect_section_maskcursoreffect",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_menus_menus_section_tsx",
+          to: "menus_section_menus",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_parallaxscroll_parallaxconfig_anim_ts",
+          to: "parallaxconfig_anim_getanimationconfig",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_parallaxscroll_parallaximages_component_tsx",
+          to: "parallaximages_component_parallaximages",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "parallaximages_component_parallaximages",
+          to: "useprefersreducedmotion_hook_useshouldusemotion",
+          label: "calls",
+          title: "calls [INFERRED]",
+          dashes: true,
+          width: 1,
+          color: { opacity: 0.35 },
+          confidence: "INFERRED",
+        },
+        {
+          from: "src_components_projects_components_sections_parallaxscroll_parallaxscroll_section_tsx",
+          to: "parallaxscroll_section_parallaxscroll",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_components_sections_pixelcursormove_pixelcursormove_section_tsx",
+          to: "pixelcursormove_section_pixelcursormove",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_projects_projectstitlecard_projectstitlecard_component_tsx",
+          to: "projectstitlecard_component_projectstitlecard",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_warnings_motion_motionwarning_modal_tsx",
+          to: "motionwarning_modal_handlebackdropclick",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_warnings_motion_motionwarning_modal_tsx",
+          to: "motionwarning_modal_handlekeydown",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_components_warnings_motionpage_motionpage_section_tsx",
+          to: "motionpage_section_motionpage",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_context_pagetransition_pagetransition_context_tsx",
+          to: "pagetransition_context_resolvehref",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_context_pagetransition_pagetransition_context_tsx",
+          to: "pagetransition_context_usepagetransitioncontext",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "pagetransition_context_usepagetransitioncontext",
+          to: "transitionlink_component_transitionlink",
+          label: "calls",
+          title: "calls [INFERRED]",
+          dashes: true,
+          width: 1,
+          color: { opacity: 0.35 },
+          confidence: "INFERRED",
+        },
+        {
+          from: "src_context_transitionlink_transitionlink_component_tsx",
+          to: "transitionlink_component_transitionlink",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_usebrowser_hook_ts",
+          to: "usebrowser_hook_detectbrowserfromua",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_usebrowser_hook_ts",
+          to: "usebrowser_hook_usebrowser",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_uselenisscrollto_hook_ts",
+          to: "uselenisscrollto_hook_easein",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_uselenisscrollto_hook_ts",
+          to: "uselenisscrollto_hook_easeout",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_uselenisscrollto_hook_ts",
+          to: "uselenisscrollto_hook_easeinout",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_uselenisscrollto_hook_ts",
+          to: "uselenisscrollto_hook_linear",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_uselenisscrollto_hook_ts",
+          to: "uselenisscrollto_hook_uselenisscrollto",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_useprefersreducedmotion_hook_ts",
+          to: "useprefersreducedmotion_hook_useshouldusemotion",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_useresponsive_hook_ts",
+          to: "useresponsive_hook_getbreakpoint",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_useresponsive_hook_ts",
+          to: "useresponsive_hook_useresponsive",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_usewarningstore_hook_ts",
+          to: "usewarningstore_hook_getnextmidnight",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_hooks_usewarningstore_hook_ts",
+          to: "usewarningstore_hook_expiringstorage",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_utils_fonts_util_ts",
+          to: "fonts_util_usefonts",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+        {
+          from: "src_utils_pxtorem_util_ts",
+          to: "pxtorem_util_pxtorem",
+          label: "contains",
+          title: "contains [EXTRACTED]",
+          dashes: false,
+          width: 2,
+          color: { opacity: 0.7 },
+          confidence: "EXTRACTED",
+        },
+      ];
+      const LEGEND = [
+        { cid: 0, color: "#4E79A7", label: "Audio Visualizer", count: 11 },
+        { cid: 1, color: "#F28E2B", label: "Animation &amp; Motion", count: 8 },
+        { cid: 2, color: "#E15759", label: "Fonts &amp; Layout", count: 6 },
+        { cid: 3, color: "#76B7B2", label: "Pages", count: 6 },
+        { cid: 4, color: "#59A14F", label: "Lenis Scroll", count: 6 },
+        { cid: 5, color: "#EDC948", label: "Arrow Icons", count: 5 },
+        { cid: 6, color: "#B07AA1", label: "Page Transitions", count: 5 },
+        {
+          cid: 7,
+          color: "#FF9DA7",
+          label: "Responsive &amp; Not Found",
+          count: 5,
+        },
+        { cid: 8, color: "#9C755F", label: "Dots Grid", count: 4 },
+        { cid: 9, color: "#BAB0AC", label: "Menu Component", count: 3 },
+        { cid: 10, color: "#4E79A7", label: "Motion Warning", count: 3 },
+        { cid: 11, color: "#F28E2B", label: "Browser Detection", count: 3 },
+        { cid: 12, color: "#E15759", label: "Warning Store", count: 3 },
+        { cid: 13, color: "#76B7B2", label: "Not Found Page", count: 2 },
+        { cid: 14, color: "#59A14F", label: "Client Layout", count: 2 },
+        { cid: 15, color: "#EDC948", label: "Home Page", count: 2 },
+        { cid: 16, color: "#B07AA1", label: "Projects Page", count: 2 },
+        {
+          cid: 17,
+          color: "#FF9DA7",
+          label: "Projects Components Layout",
+          count: 2,
+        },
+        { cid: 18, color: "#9C755F", label: "Design Layout", count: 2 },
+        { cid: 19, color: "#BAB0AC", label: "Noise Animation", count: 2 },
+        { cid: 20, color: "#4E79A7", label: "Common Header", count: 2 },
+        { cid: 21, color: "#F28E2B", label: "Footer", count: 2 },
+        { cid: 22, color: "#E15759", label: "Q&amp;A Component", count: 2 },
+        { cid: 23, color: "#76B7B2", label: "Ask Section", count: 2 },
+        { cid: 24, color: "#59A14F", label: "Hero Mouse Move", count: 2 },
+        { cid: 25, color: "#EDC948", label: "Hero Wrapper", count: 2 },
+        { cid: 26, color: "#B07AA1", label: "Home Loader", count: 2 },
+        { cid: 27, color: "#FF9DA7", label: "Project Links", count: 2 },
+        { cid: 28, color: "#9C755F", label: "Workflow", count: 2 },
+        { cid: 29, color: "#BAB0AC", label: "Adobe AE Icon", count: 2 },
+        { cid: 30, color: "#4E79A7", label: "Adobe AI Icon", count: 2 },
+        { cid: 31, color: "#F28E2B", label: "Adobe Dn Icon", count: 2 },
+        { cid: 32, color: "#E15759", label: "Adobe Lrc Icon", count: 2 },
+        { cid: 33, color: "#76B7B2", label: "Adobe Pr Icon", count: 2 },
+        { cid: 34, color: "#59A14F", label: "Adobe Ps Icon", count: 2 },
+        { cid: 35, color: "#EDC948", label: "Adobe Xd Icon", count: 2 },
+        { cid: 36, color: "#B07AA1", label: "Blender Icon", count: 2 },
+        { cid: 37, color: "#FF9DA7", label: "Figma Icon", count: 2 },
+        { cid: 38, color: "#9C755F", label: "Apollo GraphQL Icon", count: 2 },
+        { cid: 39, color: "#BAB0AC", label: "CSS Icon", count: 2 },
+        { cid: 40, color: "#4E79A7", label: "Framer Motion Icon", count: 2 },
+        { cid: 41, color: "#F28E2B", label: "GSAP Icon", count: 2 },
+        { cid: 42, color: "#E15759", label: "HTML Icon", count: 2 },
+        { cid: 43, color: "#76B7B2", label: "JavaScript Icon", count: 2 },
+        { cid: 44, color: "#59A14F", label: "Next.js Icon", count: 2 },
+        { cid: 45, color: "#EDC948", label: "React Icon", count: 2 },
+        { cid: 46, color: "#B07AA1", label: "SCSS Icon", count: 2 },
+        { cid: 47, color: "#FF9DA7", label: "TypeScript Icon", count: 2 },
+        { cid: 48, color: "#9C755F", label: "Logo Icon", count: 2 },
+        { cid: 49, color: "#BAB0AC", label: "Behance Icon", count: 2 },
+        { cid: 50, color: "#4E79A7", label: "Frontend Mentor Icon", count: 2 },
+        { cid: 51, color: "#F28E2B", label: "GitHub Icon", count: 2 },
+        { cid: 52, color: "#E15759", label: "LinkedIn Icon", count: 2 },
+        { cid: 53, color: "#76B7B2", label: "Star Icon", count: 2 },
+        { cid: 54, color: "#59A14F", label: "Component Header", count: 2 },
+        {
+          cid: 55,
+          color: "#EDC948",
+          label: "Hover Image Slide Menu",
+          count: 2,
+        },
+        { cid: 56, color: "#B07AA1", label: "Mask Cursor Effect", count: 2 },
+        { cid: 57, color: "#FF9DA7", label: "Menus Section", count: 2 },
+        { cid: 58, color: "#9C755F", label: "Parallax Config", count: 2 },
+        { cid: 59, color: "#BAB0AC", label: "Parallax Scroll", count: 2 },
+        { cid: 60, color: "#4E79A7", label: "Pixel Cursor Move", count: 2 },
+        { cid: 61, color: "#F28E2B", label: "Projects Title Card", count: 2 },
+        { cid: 62, color: "#E15759", label: "Motion Page", count: 2 },
+        { cid: 63, color: "#76B7B2", label: "Px to Rem Utility", count: 2 },
+        { cid: 64, color: "#59A14F", label: "Next Config", count: 1 },
+        { cid: 65, color: "#EDC948", label: "Vitest Config", count: 1 },
+        { cid: 66, color: "#B07AA1", label: "Animated Text", count: 1 },
+        { cid: 67, color: "#FF9DA7", label: "Footer DB", count: 1 },
+        { cid: 68, color: "#9C755F", label: "Header", count: 1 },
+        { cid: 69, color: "#BAB0AC", label: "Image Section", count: 1 },
+        { cid: 70, color: "#4E79A7", label: "Socials Component", count: 1 },
+        { cid: 71, color: "#F28E2B", label: "Socials DB", count: 1 },
+        { cid: 72, color: "#E15759", label: "Home About", count: 1 },
+        { cid: 73, color: "#76B7B2", label: "Ask DB", count: 1 },
+        { cid: 74, color: "#59A14F", label: "Home Projects", count: 1 },
+        { cid: 75, color: "#EDC948", label: "Projects DB", count: 1 },
+        { cid: 76, color: "#B07AA1", label: "Skills DB", count: 1 },
+        { cid: 77, color: "#FF9DA7", label: "Workflow DB", count: 1 },
+        { cid: 78, color: "#9C755F", label: "Angular Icon", count: 1 },
+        { cid: 79, color: "#BAB0AC", label: "Node Icon", count: 1 },
+        { cid: 80, color: "#4E79A7", label: "Three.js Icon", count: 1 },
+        { cid: 81, color: "#F28E2B", label: "Components", count: 1 },
+        { cid: 82, color: "#E15759", label: "Components DB", count: 1 },
+        { cid: 83, color: "#76B7B2", label: "Menu Animation", count: 1 },
+        { cid: 84, color: "#59A14F", label: "Team Member DB", count: 1 },
+        { cid: 85, color: "#EDC948", label: "Parallax Images DB", count: 1 },
+        { cid: 86, color: "#B07AA1", label: "Scroll Text Reveal", count: 1 },
+        { cid: 87, color: "#FF9DA7", label: "Project Warning", count: 1 },
+        { cid: 88, color: "#9C755F", label: "Design DB", count: 1 },
+        { cid: 89, color: "#BAB0AC", label: "Design Section", count: 1 },
+        { cid: 90, color: "#4E79A7", label: "Sahil Satpute Icon", count: 1 },
+        { cid: 91, color: "#F28E2B", label: "Motion Info Data", count: 1 },
+        { cid: 92, color: "#E15759", label: "Test Setup", count: 1 },
+        { cid: 93, color: "#76B7B2", label: "Colors Utility", count: 1 },
+        { cid: 94, color: "#59A14F", label: "Image Utility", count: 1 },
+        { cid: 95, color: "#EDC948", label: "Index Utility", count: 1 },
+      ];
+
+      // HTML-escape helper — prevents XSS when injecting graph data into innerHTML
+      function esc(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      // Build vis datasets
+      const nodesDS = new vis.DataSet(
+        RAW_NODES.map((n) => ({
+          id: n.id,
+          label: n.label,
+          color: n.color,
+          size: n.size,
+          font: n.font,
+          title: n.title,
+          _community: n.community,
+          _community_name: n.community_name,
+          _source_file: n.source_file,
+          _file_type: n.file_type,
+          _degree: n.degree,
+        })),
+      );
+
+      const edgesDS = new vis.DataSet(
+        RAW_EDGES.map((e, i) => ({
+          id: i,
+          from: e.from,
+          to: e.to,
+          label: "",
+          title: e.title,
+          dashes: e.dashes,
+          width: e.width,
+          color: e.color,
+          arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+        })),
+      );
+
+      const container = document.getElementById("graph");
+      const network = new vis.Network(
+        container,
+        { nodes: nodesDS, edges: edgesDS },
+        {
+          physics: {
+            enabled: true,
+            solver: "forceAtlas2Based",
+            forceAtlas2Based: {
+              gravitationalConstant: -60,
+              centralGravity: 0.005,
+              springLength: 120,
+              springConstant: 0.08,
+              damping: 0.4,
+              avoidOverlap: 0.8,
+            },
+            stabilization: { iterations: 200, fit: true },
+          },
+          interaction: {
+            hover: true,
+            tooltipDelay: 100,
+            hideEdgesOnDrag: true,
+            navigationButtons: false,
+            keyboard: false,
+          },
+          nodes: { shape: "dot", borderWidth: 1.5 },
+          edges: {
+            smooth: { type: "continuous", roundness: 0.2 },
+            selectionWidth: 3,
+          },
+        },
+      );
+
+      network.once("stabilizationIterationsDone", () => {
+        network.setOptions({ physics: { enabled: false } });
+      });
+
+      function showInfo(nodeId) {
+        const n = nodesDS.get(nodeId);
+        if (!n) return;
+        const neighborIds = network.getConnectedNodes(nodeId);
+        const neighborItems = neighborIds
+          .map((nid) => {
+            const nb = nodesDS.get(nid);
+            const color = nb ? nb.color.background : "#555";
+            return `<span class="neighbor-link" style="border-left-color:${esc(color)}" onclick="focusNode(${JSON.stringify(nid)})">${esc(nb ? nb.label : nid)}</span>`;
+          })
+          .join("");
+        document.getElementById("info-content").innerHTML = `
+    <div class="field"><b>${esc(n.label)}</b></div>
+    <div class="field">Type: ${esc(n._file_type || "unknown")}</div>
+    <div class="field">Community: ${esc(n._community_name)}</div>
+    <div class="field">Source: ${esc(n._source_file || "-")}</div>
+    <div class="field">Degree: ${n._degree}</div>
+    ${neighborIds.length ? `<div class="field" style="margin-top:8px;color:#aaa;font-size:11px">Neighbors (${neighborIds.length})</div><div id="neighbors-list">${neighborItems}</div>` : ""}
+  `;
+      }
+
+      function focusNode(nodeId) {
+        network.focus(nodeId, { scale: 1.4, animation: true });
+        network.selectNodes([nodeId]);
+        showInfo(nodeId);
+      }
+
+      // Track hovered node — hover detection is more reliable than click params
+      let hoveredNodeId = null;
+      network.on("hoverNode", (params) => {
+        hoveredNodeId = params.node;
+        container.style.cursor = "pointer";
+      });
+      network.on("blurNode", () => {
+        hoveredNodeId = null;
+        container.style.cursor = "default";
+      });
+      container.addEventListener("click", () => {
+        if (hoveredNodeId !== null) {
+          showInfo(hoveredNodeId);
+          network.selectNodes([hoveredNodeId]);
+        }
+      });
+      network.on("click", (params) => {
+        if (params.nodes.length > 0) {
+          showInfo(params.nodes[0]);
+        } else if (hoveredNodeId === null) {
+          document.getElementById("info-content").innerHTML =
+            '<span class="empty">Click a node to inspect it</span>';
+        }
+      });
+
+      const searchInput = document.getElementById("search");
+      const searchResults = document.getElementById("search-results");
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.toLowerCase().trim();
+        searchResults.innerHTML = "";
+        if (!q) {
+          searchResults.style.display = "none";
+          return;
+        }
+        const matches = RAW_NODES.filter((n) =>
+          n.label.toLowerCase().includes(q),
+        ).slice(0, 20);
+        if (!matches.length) {
+          searchResults.style.display = "none";
+          return;
+        }
+        searchResults.style.display = "block";
+        matches.forEach((n) => {
+          const el = document.createElement("div");
+          el.className = "search-item";
+          el.textContent = n.label;
+          el.style.borderLeft = `3px solid ${n.color.background}`;
+          el.style.paddingLeft = "8px";
+          el.onclick = () => {
+            network.focus(n.id, { scale: 1.5, animation: true });
+            network.selectNodes([n.id]);
+            showInfo(n.id);
+            searchResults.style.display = "none";
+            searchInput.value = "";
+          };
+          searchResults.appendChild(el);
+        });
+      });
+      document.addEventListener("click", (e) => {
+        if (!searchResults.contains(e.target) && e.target !== searchInput)
+          searchResults.style.display = "none";
+      });
+
+      const hiddenCommunities = new Set();
+      const legendEl = document.getElementById("legend");
+      LEGEND.forEach((c) => {
+        const item = document.createElement("div");
+        item.className = "legend-item";
+        item.innerHTML = `<div class="legend-dot" style="background:${c.color}"></div>
+    <span class="legend-label">${c.label}</span>
+    <span class="legend-count">${c.count}</span>`;
+        item.onclick = () => {
+          if (hiddenCommunities.has(c.cid)) {
+            hiddenCommunities.delete(c.cid);
+            item.classList.remove("dimmed");
+          } else {
+            hiddenCommunities.add(c.cid);
+            item.classList.add("dimmed");
+          }
+          const updates = RAW_NODES.filter((n) => n.community === c.cid).map(
+            (n) => ({ id: n.id, hidden: hiddenCommunities.has(c.cid) }),
+          );
+          nodesDS.update(updates);
+        };
+        legendEl.appendChild(item);
+      });
+    </script>
+    <script>
+      // Render hyperedges as shaded regions
+      const hyperedges = [];
+      // afterDrawing passes ctx already transformed to network coordinate space.
+      // Draw node positions raw — no manual pan/zoom/DPR math needed.
+      network.on("afterDrawing", function (ctx) {
+        hyperedges.forEach((h) => {
+          const positions = h.nodes
+            .map((nid) => network.getPositions([nid])[nid])
+            .filter((p) => p !== undefined);
+          if (positions.length < 2) return;
+          ctx.save();
+          ctx.globalAlpha = 0.12;
+          ctx.fillStyle = "#6366f1";
+          ctx.strokeStyle = "#6366f1";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          // Centroid and expanded hull in network coordinates
+          const cx = positions.reduce((s, p) => s + p.x, 0) / positions.length;
+          const cy = positions.reduce((s, p) => s + p.y, 0) / positions.length;
+          const expanded = positions.map((p) => ({
+            x: cx + (p.x - cx) * 1.15,
+            y: cy + (p.y - cy) * 1.15,
+          }));
+          ctx.moveTo(expanded[0].x, expanded[0].y);
+          expanded.slice(1).forEach((p) => ctx.lineTo(p.x, p.y));
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = 0.4;
+          ctx.stroke();
+          // Label
+          ctx.globalAlpha = 0.8;
+          ctx.fillStyle = "#4f46e5";
+          ctx.font = "bold 11px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(h.label, cx, cy - 5);
+          ctx.restore();
+        });
+      });
+    </script>
+  </body>
+</html>

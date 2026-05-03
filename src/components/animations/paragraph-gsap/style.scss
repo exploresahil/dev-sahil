@@ -1,0 +1,12 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+.paragraph-gsap {
+  width: 100%;
+  height: auto;
+
+  p {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

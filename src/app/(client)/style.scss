@@ -1,0 +1,15 @@
+@use "./scss/abstracts" as *;
+
+#home {
+    h1 {
+     
+
+        @include breakpoint(medium) {
+         color: red
+        }
+
+        @include breakpoint(large) {
+         color: blue
+        }
+    }
+}

@@ -1,0 +1,120 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#HomeHero {
+  height: 250vh;
+  position: relative;
+
+  .hero_slide {
+    @include full_width;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-top: -100vh;
+    margin-top: -100svh;
+  }
+
+  svg {
+    width: 100%;
+    position: relative;
+    bottom: 20%;
+    opacity: 0;
+
+    @include breakpoint(medium) {
+      bottom: 0;
+    }
+  }
+
+  .hero_img_container {
+    width: 140%;
+    aspect-ratio: 1;
+    position: absolute;
+    bottom: 0;
+    transform-origin: center bottom;
+
+    @include breakpoint(medium) {
+      width: 100%;
+    }
+
+    @include breakpoint(large) {
+      width: 48%;
+    }
+
+    @include breakpoint(xlarge) {
+      width: 40%;
+    }
+
+    img {
+      object-fit: contain;
+    }
+  }
+
+  .designation {
+    color: $color_secondary;
+    position: absolute;
+    z-index: 2;
+    bottom: 6%;
+    // initial hidden state controlled by GSAP
+    opacity: 0;
+
+    @include breakpoint(medium) {
+      font-size: rem(24);
+    }
+
+    @include breakpoint(large) {
+      font-size: rem(16);
+    }
+  }
+
+  .text {
+    @include full_width;
+    position: relative;
+    z-index: 2;
+    color: $color_default_light;
+    font-family: $font_default_mono;
+    font-size: rem(12);
+
+    @include breakpoint(medium) {
+      font-size: rem(24);
+    }
+
+    @include breakpoint(large) {
+      font-size: rem(16);
+    }
+
+    p {
+      max-width: 80%;
+      position: absolute;
+
+      @include breakpoint(medium) {
+        max-width: 60%;
+      }
+
+      @include breakpoint(large) {
+        max-width: 30%;
+      }
+    }
+  }
+
+  .text_one {
+    bottom: -50%;
+  }
+
+  .text_two {
+    bottom: -55%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .bottom {
+    width: 100%;
+    height: 50vh;
+    position: absolute;
+    bottom: calc(-50vh + rem(1));
+    z-index: 2;
+  }
+}

@@ -1,0 +1,67 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#ImageSection {
+  display: flex;
+  flex-direction: column;
+  gap: rem(40);
+  padding-block: rem(40);
+  align-items: center;
+
+  @include breakpoint(large) {
+    height: 100%;
+  }
+
+  .image_section_image {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @include breakpoint(medium) {
+      aspect-ratio: 4 / 2;
+    }
+
+    @include breakpoint(large) {
+      height: auto;
+    }
+
+    img {
+      object-fit: cover;
+      filter: grayscale(1);
+    }
+  }
+
+  .image_section_content {
+    width: 100%;
+
+    h2 {
+      color: $color_primary;
+    }
+
+    .image_section_children {
+      display: flex;
+      flex-direction: column;
+      gap: rem(10);
+
+      @include breakpoint(large) {
+        gap: rem(16);
+      }
+    }
+  }
+}
+
+#ImageSection.default {
+  @include breakpoint(large) {
+    flex-direction: row;
+    gap: rem(100);
+  }
+}
+
+#ImageSection.right {
+  @include breakpoint(large) {
+    flex-direction: row-reverse;
+    gap: rem(100);
+  }
+}

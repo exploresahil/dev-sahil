@@ -1,0 +1,8 @@
+// Three.js appends a <canvas> whose attribute dimensions are in device pixels
+// (width × pixelRatio). Without explicit CSS the canvas renders at its
+// attribute size in CSS px, overflowing on high-DPI / mobile screens.
+.dot_grid canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

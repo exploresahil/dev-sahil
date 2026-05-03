@@ -1,0 +1,88 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+.title_container {
+  width: 100%;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  gap: rem(20);
+
+  @include breakpoint(medium) {
+    height: 32vh;
+  }
+
+  @include breakpoint(large) {
+    height: 44vh;
+  }
+
+  .img_container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 70%;
+      z-index: 1;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 1) 100%
+      );
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      inset: 0;
+      position: absolute;
+      object-fit: cover;
+    }
+
+    .text {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+      color: $color_default_light;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: rem(10);
+      padding: rem(20);
+
+      p {
+        font-size: rem(12);
+        font-weight: 200;
+      }
+
+      @include breakpoint(large) {
+        padding: rem(40);
+
+        h2 {
+          font-size: rem(36);
+        }
+
+        p {
+          font-size: rem(16);
+        }
+      }
+    }
+  }
+
+  h2 {
+    @include font_rische;
+    font-size: rem(30);
+  }
+
+  p {
+    @include breakpoint(large) {
+      max-width: 60%;
+    }
+  }
+}

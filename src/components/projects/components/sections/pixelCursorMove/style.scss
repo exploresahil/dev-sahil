@@ -1,0 +1,46 @@
+@use "../../../../../app/(client)/scss/abstracts" as *;
+
+#PixelCursorMove {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: rem(40);
+
+  .body {
+    font-family: $font_default_mono;
+    font-size: 6vw;
+    text-align: center;
+    font-weight: 400;
+    width: 70%;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+    text-transform: uppercase;
+    line-height: 1;
+    mix-blend-mode: difference;
+    color: $color_default_light;
+  }
+
+  .grid {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: absolute;
+
+    .column {
+      width: 5vw;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      div {
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+      }
+    }
+  }
+}

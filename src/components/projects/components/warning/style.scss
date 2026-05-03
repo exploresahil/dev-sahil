@@ -1,0 +1,74 @@
+@use "../../../../app/(client)/scss/abstracts" as *;
+
+#ProjectWarning {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: hsl(from $color_default_dark h s l / 0.75);
+  backdrop-filter: blur(rem(10));
+  display: flex;
+  align-items: flex-end;
+  padding-block: rem(20);
+  @include full_width;
+
+  @include breakpoint(medium) {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .warning_container {
+    background-color: $color_default_light;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+    padding: rem(20);
+
+    @include breakpoint(medium) {
+      width: 80%;
+    }
+
+    @include breakpoint(large) {
+      width: 50%;
+    }
+
+    @include breakpoint(xlarge) {
+      width: 40%;
+    }
+
+    @include breakpoint(xxlarge) {
+      width: 30%;
+    }
+
+    .title {
+      width: 100%;
+      min-width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      svg {
+        color: $color_primary;
+        cursor: pointer;
+      }
+    }
+
+    h1 {
+      font-size: rem(24);
+      line-height: 1.2;
+      @include font_rische;
+    }
+
+    p {
+      @include breakpoint(medium) {
+        max-width: 90%;
+      }
+    }
+
+    a {
+      color: $color_primary;
+    }
+  }
+}

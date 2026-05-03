@@ -1,0 +1,49 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#DesignHeader {
+  margin-top: rem(80);
+  display: flex;
+  justify-content: space-between;
+  padding-block: rem(10);
+  border-block: rem(1) dashed $color_default_dark;
+
+  @include full_width;
+
+  @include breakpoint(xxlarge) {
+    height: rem(100);
+  }
+
+  .header_title {
+    display: flex;
+    flex-direction: column;
+    gap: rem(2);
+    max-width: 80%;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: rem(5);
+      color: $color_accent;
+      font-size: rem(12);
+      margin-bottom: rem(5);
+
+      svg {
+        path {
+          fill: $color_accent;
+        }
+      }
+    }
+
+    h2 {
+      font-size: rem(30);
+      @include font_rische;
+    }
+
+    h3 {
+      text-transform: uppercase;
+      font-size: rem(16);
+      margin-top: rem(2);
+      font-weight: 200;
+    }
+  }
+}
