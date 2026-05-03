@@ -24,7 +24,6 @@ const ProjectWarning = ({
     if (shouldUseMotion) {
       setOpen(true);
     }
-    const hello:string =  
   }, [shouldUseMotion]);
 
   if (!open) return null;
