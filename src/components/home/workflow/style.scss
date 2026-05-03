@@ -1,0 +1,9 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#Workflow {
+  @include full_width;
+
+  @include breakpoint(large) {
+    padding-block: rem(80);
+  }
+}

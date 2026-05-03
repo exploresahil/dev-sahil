@@ -1,0 +1,37 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#Socials {
+  display: flex;
+  gap: rem(10);
+  align-self: flex-end;
+  padding-bottom: rem(5);
+
+  @include breakpoint(large) {
+    padding-bottom: rem(0);
+  }
+
+  a {
+    display: flex;
+    align-items: flex-end;
+
+    @include breakpoint(large) {
+      &:hover {
+        svg {
+          fill: $color_primary;
+        }
+      }
+    }
+  }
+
+  svg {
+    width: rem(16);
+    height: rem(16);
+    fill: $color_secondary;
+    transition: fill 300ms $easing_default;
+
+    @include breakpoint(large) {
+      width: rem(20);
+      height: rem(20);
+    }
+  }
+}

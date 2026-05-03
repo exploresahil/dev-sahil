@@ -1,0 +1,34 @@
+@use "../../app/(client)/scss/abstracts" as *;
+
+#PageTransitionProvider {
+  .svg_path {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%; /* Changed from 100vw to 100vh */
+    z-index: 9999; /* Ensure it stays above everything */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Ignore clicks when hidden */
+
+    svg {
+      transform: scale(4);
+
+      @include breakpoint(medium) {
+        transform: scale(3);
+      }
+
+      @include breakpoint(large) {
+        transform: scale(2);
+      }
+
+      // Pre-hide the path before JS runs to prevent flash on refresh.
+      // GSAP overrides these with inline styles (actual pathLength) after mount.
+      path {
+        stroke-dasharray: 9999px;
+        stroke-dashoffset: 9999px;
+      }
+    }
+  }
+}

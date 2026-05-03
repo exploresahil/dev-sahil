@@ -1,0 +1,34 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#HomeAbout {
+  height: 100vh;
+  @include full_width;
+  display: flex;
+  align-items: center;
+  font-family: $font_rische;
+  font-size: rem(46);
+
+  @include breakpoint(medium) {
+    height: 40vh;
+  }
+
+  @include breakpoint(large) {
+    height: 100vh;
+    font-size: rem(52);
+  }
+
+  @include breakpoint(xlarge) {
+    font-size: rem(80);
+  }
+
+  .text {
+    width: 100%;
+  }
+
+  p {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: rem(4);
+    align-items: flex-end;
+  }
+}

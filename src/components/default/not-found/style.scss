@@ -1,0 +1,54 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#notFound {
+  width: 100vw;
+  max-width: 100%;
+  height: 100dvh;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-color: $color_default_dark;
+  padding-bottom: 10vh;
+
+  .text_container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(10);
+
+    @include breakpoint(large) {
+      gap: rem(20);
+    }
+
+    a {
+      font-family: $font_default_sans;
+      color: $color_default_dark;
+      background-color: $color_default_light;
+      padding: rem(10) rem(20);
+    }
+
+    .animated_text {
+      padding: rem(10) rem(20);
+    }
+
+    @include breakpoint(medium) {
+      a {
+        padding: 0;
+      }
+      .animated_text {
+        font-family: $font_default_sans;
+        color: $color_default_dark;
+        background-color: $color_default_light;
+
+        @include breakpoint(large) {
+          &:hover {
+            color: $color_primary;
+          }
+        }
+      }
+    }
+  }
+}

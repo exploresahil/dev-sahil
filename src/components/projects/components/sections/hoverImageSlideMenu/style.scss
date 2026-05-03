@@ -1,0 +1,72 @@
+@use "../../../../../app/(client)/scss/abstracts" as *;
+
+#HoverImageSlideMenu {
+  display: flex;
+  flex-direction: column;
+  padding-block: rem(40);
+  gap: rem(20);
+  @include full_width;
+
+  @include breakpoint(large) {
+    align-items: center;
+  }
+
+  .menu_container {
+    @include breakpoint(large) {
+      width: 50%;
+    }
+    h1 {
+      @include font_rische;
+    }
+
+    .team_container {
+      padding-top: rem(20);
+
+      ul {
+        $transitionDuration: 300ms;
+
+        li {
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: rem(5);
+          border-bottom: rem(1) solid $color_default_dark;
+          padding-block: rem(12);
+          transition: gap $transitionDuration $easing_default;
+
+          &:nth-last-of-type(1) {
+            border-bottom: none;
+          }
+
+          h5 {
+            font-weight: 200;
+            font-size: rem(28);
+          }
+
+          .img_container {
+            width: rem(0);
+            height: rem(50);
+            position: relative;
+            overflow: hidden;
+            transition: width $transitionDuration $easing_default;
+
+            img {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              inset: 0;
+              object-fit: cover;
+            }
+          }
+
+          &:hover {
+            gap: rem(10);
+            .img_container {
+              width: rem(76);
+            }
+          }
+        }
+      }
+    }
+  }
+}

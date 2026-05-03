@@ -1,0 +1,107 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#HomeSkills {
+  @include full_width;
+  padding-block: rem(80);
+  background-color: $color_default_dark;
+  color: $color_default_light;
+
+  .skills_categories {
+    display: flex;
+    flex-direction: column;
+    gap: rem(64);
+
+    @include breakpoint(large) {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+    }
+  }
+
+  .skills_category {
+    @include breakpoint(large) {
+      flex: 1;
+
+      &:not(:last-child) {
+        padding-right: rem(80);
+        border-right: rem(1) solid rgba($color_default_light, 0.08);
+      }
+
+      &:not(:first-child) {
+        padding-left: rem(80);
+      }
+    }
+  }
+
+  .skills_category_title {
+    font-size: rem(11);
+    letter-spacing: rem(2);
+    text-transform: uppercase;
+    color: rgba($color_default_light, 0.25);
+    margin-bottom: rem(32);
+  }
+
+  .skills_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: rem(32) rem(16);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    @include breakpoint(medium) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: rem(36) rem(24);
+    }
+
+    @include breakpoint(large) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .skill_item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(10);
+    cursor: default;
+
+    .skill_icon {
+      width: rem(32);
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s $easing_default;
+
+      @include breakpoint(xlarge) {
+        width: rem(40);
+      }
+
+      svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    }
+
+    .skill_name {
+      font-size: rem(10);
+      text-align: center;
+      color: rgba($color_default_light, 0.4);
+      letter-spacing: rem(0.4);
+      transition: color 0.35s ease;
+      white-space: nowrap;
+    }
+
+    &:hover {
+      .skill_icon {
+        transform: translateY(rem(-5)) scale(1.12);
+      }
+
+      .skill_name {
+        color: rgba($color_default_light, 0.9);
+      }
+    }
+  }
+}

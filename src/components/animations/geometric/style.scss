@@ -1,0 +1,79 @@
+@keyframes floatUp {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes floatDown {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(15px);
+  }
+}
+
+@keyframes floatDiagonal {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(12px, -20px);
+  }
+}
+
+@keyframes floatArrow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.float-up {
+  animation: floatUp 4s ease-in-out infinite;
+}
+
+.float-down {
+  animation: floatDown 4s ease-in-out infinite;
+}
+
+.float-diagonal {
+  animation: floatDiagonal 4.4s ease-in-out infinite;
+}
+
+.float-arrow {
+  animation: floatArrow 3s ease-in-out infinite;
+}
+
+.float-up-fast {
+  animation: floatUp 3s ease-in-out infinite;
+}
+
+.float-up-slow {
+  animation: floatUp 5s ease-in-out infinite;
+}
+
+.float-random {
+  animation: floatUp 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-up,
+  .float-down,
+  .float-diagonal,
+  .float-arrow,
+  .float-up-fast,
+  .float-up-slow,
+  .float-random {
+    animation: none;
+  }
+}

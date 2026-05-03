@@ -1,0 +1,612 @@
+{
+  "communities": {
+    "0": [
+      "audiovisualizer_section_bars",
+      "audiovisualizer_section_formattime",
+      "audiovisualizer_section_handlefileupload",
+      "audiovisualizer_section_onended",
+      "audiovisualizer_section_onmetadata",
+      "audiovisualizer_section_onpause",
+      "audiovisualizer_section_onplay",
+      "audiovisualizer_section_ontimeupdate",
+      "audiovisualizer_section_togglemute",
+      "audiovisualizer_section_toggleplay",
+      "src_components_projects_components_sections_audiovisualizer_audiovisualizer_section_tsx"
+    ],
+    "1": [
+      "homeskills_section_homeskills",
+      "paragraphgsap_paragraphgsap",
+      "parallaximages_component_parallaximages",
+      "src_components_animations_paragraph_gsap_paragraphgsap_tsx",
+      "src_components_home_skills_homeskills_section_tsx",
+      "src_components_projects_components_sections_parallaxscroll_parallaximages_component_tsx",
+      "src_hooks_useprefersreducedmotion_hook_ts",
+      "useprefersreducedmotion_hook_useshouldusemotion"
+    ],
+    "2": [
+      "fonts_util_usefonts",
+      "layout_generatemetadata",
+      "layout_rootlayout",
+      "src_app_client_reduce_motion_info_layout_tsx",
+      "src_app_layout_tsx",
+      "src_utils_fonts_util_ts"
+    ],
+    "3": [
+      "page_page",
+      "src_app_client_projects_components_component_page_tsx",
+      "src_app_client_projects_components_page_tsx",
+      "src_app_client_projects_design_page_tsx",
+      "src_app_client_projects_magazine_page_tsx",
+      "src_app_client_reduce_motion_info_page_tsx"
+    ],
+    "4": [
+      "src_hooks_uselenisscrollto_hook_ts",
+      "uselenisscrollto_hook_easein",
+      "uselenisscrollto_hook_easeinout",
+      "uselenisscrollto_hook_easeout",
+      "uselenisscrollto_hook_linear",
+      "uselenisscrollto_hook_uselenisscrollto"
+    ],
+    "5": [
+      "arrows_icons_arrowback",
+      "arrows_icons_arrowdown",
+      "arrows_icons_arrownext",
+      "arrows_icons_arrowup",
+      "src_components_icon_ui_arrows_icons_tsx"
+    ],
+    "6": [
+      "pagetransition_context_resolvehref",
+      "pagetransition_context_usepagetransitioncontext",
+      "src_context_pagetransition_pagetransition_context_tsx",
+      "src_context_transitionlink_transitionlink_component_tsx",
+      "transitionlink_component_transitionlink"
+    ],
+    "7": [
+      "pagenotfound_section_pagenotfound",
+      "src_components_default_not_found_pagenotfound_section_tsx",
+      "src_hooks_useresponsive_hook_ts",
+      "useresponsive_hook_getbreakpoint",
+      "useresponsive_hook_useresponsive"
+    ],
+    "8": [
+      "dotsgrid_component_buildpattern",
+      "dotsgrid_component_dotsgrid",
+      "dotsgrid_component_makerovers",
+      "src_components_animations_dots_grid_dotsgrid_component_tsx"
+    ],
+    "9": [
+      "menu_component_handleclose",
+      "menu_component_handleitemclick",
+      "src_components_projects_components_componentheader_menu_menu_component_tsx"
+    ],
+    "10": [
+      "motionwarning_modal_handlebackdropclick",
+      "motionwarning_modal_handlekeydown",
+      "src_components_warnings_motion_motionwarning_modal_tsx"
+    ],
+    "11": [
+      "src_hooks_usebrowser_hook_ts",
+      "usebrowser_hook_detectbrowserfromua",
+      "usebrowser_hook_usebrowser"
+    ],
+    "12": [
+      "src_hooks_usewarningstore_hook_ts",
+      "usewarningstore_hook_expiringstorage",
+      "usewarningstore_hook_getnextmidnight"
+    ],
+    "13": [
+      "not_found_notfound",
+      "src_app_not_found_tsx"
+    ],
+    "14": [
+      "layout_clientlayout",
+      "src_app_client_layout_tsx"
+    ],
+    "15": [
+      "page_home",
+      "src_app_client_page_tsx"
+    ],
+    "16": [
+      "page_projectspage",
+      "src_app_client_projects_page_tsx"
+    ],
+    "17": [
+      "layout_componentlayout",
+      "src_app_client_projects_components_layout_tsx"
+    ],
+    "18": [
+      "layout_designlayout",
+      "src_app_client_projects_design_layout_tsx"
+    ],
+    "19": [
+      "noise_noise",
+      "src_components_animations_noise_noise_tsx"
+    ],
+    "20": [
+      "commonheader_section_commonheader",
+      "src_components_default_commonheader_commonheader_section_tsx"
+    ],
+    "21": [
+      "footer_footer_footer",
+      "src_components_default_footer_footer_footer_tsx"
+    ],
+    "22": [
+      "qa_component_handletoggle",
+      "src_components_default_qa_qa_component_tsx"
+    ],
+    "23": [
+      "ask_section_ask",
+      "src_components_home_ask_ask_section_tsx"
+    ],
+    "24": [
+      "homehero_section_handlemousemove",
+      "src_components_home_hero_homehero_section_tsx"
+    ],
+    "25": [
+      "homeherowrapper_wrapper_homeherowrapper",
+      "src_components_home_hero_homeherowrapper_wrapper_tsx"
+    ],
+    "26": [
+      "homeloader_component_homeloader",
+      "src_components_home_loader_homeloader_component_tsx"
+    ],
+    "27": [
+      "projectlinks_component_projectlinks",
+      "src_components_home_projects_projectlinks_projectlinks_component_tsx"
+    ],
+    "28": [
+      "src_components_home_workflow_workflow_section_tsx",
+      "workflow_section_workflow"
+    ],
+    "29": [
+      "adobeae_icon_adobeae",
+      "src_components_icon_creative_adobeae_icon_tsx"
+    ],
+    "30": [
+      "adobeai_icon_adobeai",
+      "src_components_icon_creative_adobeai_icon_tsx"
+    ],
+    "31": [
+      "adobedn_icon_adobedn",
+      "src_components_icon_creative_adobedn_icon_tsx"
+    ],
+    "32": [
+      "adobelrc_icon_adobelrc",
+      "src_components_icon_creative_adobelrc_icon_tsx"
+    ],
+    "33": [
+      "adobepr_icon_adobepr",
+      "src_components_icon_creative_adobepr_icon_tsx"
+    ],
+    "34": [
+      "adobeps_icon_adobeps",
+      "src_components_icon_creative_adobeps_icon_tsx"
+    ],
+    "35": [
+      "adobexd_icon_adobexd",
+      "src_components_icon_creative_adobexd_icon_tsx"
+    ],
+    "36": [
+      "blender_icon_blender",
+      "src_components_icon_creative_blender_icon_tsx"
+    ],
+    "37": [
+      "figma_icon_figma",
+      "src_components_icon_creative_figma_icon_tsx"
+    ],
+    "38": [
+      "apollographql_icon_apollographqllogo",
+      "src_components_icon_development_apollographql_icon_tsx"
+    ],
+    "39": [
+      "css_icon_css",
+      "src_components_icon_development_css_icon_tsx"
+    ],
+    "40": [
+      "framermotion_icon_framermotionlogo",
+      "src_components_icon_development_framermotion_icon_tsx"
+    ],
+    "41": [
+      "gsap_icon_gsap",
+      "src_components_icon_development_gsap_icon_tsx"
+    ],
+    "42": [
+      "html_icon_html",
+      "src_components_icon_development_html_icon_tsx"
+    ],
+    "43": [
+      "javascript_icon_javascript",
+      "src_components_icon_development_javascript_icon_tsx"
+    ],
+    "44": [
+      "nextjs_icon_nextjslogo",
+      "src_components_icon_development_nextjs_icon_tsx"
+    ],
+    "45": [
+      "react_icon_react",
+      "src_components_icon_development_react_icon_tsx"
+    ],
+    "46": [
+      "scss_icon_scss",
+      "src_components_icon_development_scss_icon_tsx"
+    ],
+    "47": [
+      "src_components_icon_development_typescript_icon_tsx",
+      "typescript_icon_typescript"
+    ],
+    "48": [
+      "logo_icon_logo",
+      "src_components_icon_logo_logo_icon_tsx"
+    ],
+    "49": [
+      "behance_icon_behance",
+      "src_components_icon_social_behance_icon_tsx"
+    ],
+    "50": [
+      "frontendmentor_icon_frontendmentor",
+      "src_components_icon_social_frontendmentor_icon_tsx"
+    ],
+    "51": [
+      "github_icon_github",
+      "src_components_icon_social_github_icon_tsx"
+    ],
+    "52": [
+      "linkedin_icon_linkedin",
+      "src_components_icon_social_linkedin_icon_tsx"
+    ],
+    "53": [
+      "src_components_icon_star_star_tsx",
+      "star_star"
+    ],
+    "54": [
+      "componenthearder_section_componenthearder",
+      "src_components_projects_components_componentheader_componenthearder_section_tsx"
+    ],
+    "55": [
+      "hoverimageslidemenu_section_hoverimageslidemenu",
+      "src_components_projects_components_sections_hoverimageslidemenu_hoverimageslidemenu_section_tsx"
+    ],
+    "56": [
+      "maskcursoreffect_section_maskcursoreffect",
+      "src_components_projects_components_sections_maskcursoreffect_maskcursoreffect_section_tsx"
+    ],
+    "57": [
+      "menus_section_menus",
+      "src_components_projects_components_sections_menus_menus_section_tsx"
+    ],
+    "58": [
+      "parallaxconfig_anim_getanimationconfig",
+      "src_components_projects_components_sections_parallaxscroll_parallaxconfig_anim_ts"
+    ],
+    "59": [
+      "parallaxscroll_section_parallaxscroll",
+      "src_components_projects_components_sections_parallaxscroll_parallaxscroll_section_tsx"
+    ],
+    "60": [
+      "pixelcursormove_section_pixelcursormove",
+      "src_components_projects_components_sections_pixelcursormove_pixelcursormove_section_tsx"
+    ],
+    "61": [
+      "projectstitlecard_component_projectstitlecard",
+      "src_components_projects_projectstitlecard_projectstitlecard_component_tsx"
+    ],
+    "62": [
+      "motionpage_section_motionpage",
+      "src_components_warnings_motionpage_motionpage_section_tsx"
+    ],
+    "63": [
+      "pxtorem_util_pxtorem",
+      "src_utils_pxtorem_util_ts"
+    ],
+    "64": [
+      "next_config_ts"
+    ],
+    "65": [
+      "vitest_config_ts"
+    ],
+    "66": [
+      "src_components_animations_animated_text_animatedtext_tsx"
+    ],
+    "67": [
+      "src_components_default_footer_footer_db_ts"
+    ],
+    "68": [
+      "src_components_default_header_header_header_tsx"
+    ],
+    "69": [
+      "src_components_default_imagesection_imagesection_component_tsx"
+    ],
+    "70": [
+      "src_components_default_socials_socials_component_tsx"
+    ],
+    "71": [
+      "src_components_default_socials_socials_db_ts"
+    ],
+    "72": [
+      "src_components_home_about_homeabout_section_tsx"
+    ],
+    "73": [
+      "src_components_home_ask_ask_db_ts"
+    ],
+    "74": [
+      "src_components_home_projects_homeprojects_section_tsx"
+    ],
+    "75": [
+      "src_components_home_projects_projects_db_ts"
+    ],
+    "76": [
+      "src_components_home_skills_skills_db_ts"
+    ],
+    "77": [
+      "src_components_home_workflow_workflow_db_ts"
+    ],
+    "78": [
+      "src_components_icon_development_angular_icon_tsx"
+    ],
+    "79": [
+      "src_components_icon_development_node_icon_tsx"
+    ],
+    "80": [
+      "src_components_icon_development_three_icon_tsx"
+    ],
+    "81": [
+      "src_components_projects_components_components_component_tsx"
+    ],
+    "82": [
+      "src_components_projects_components_components_db_ts"
+    ],
+    "83": [
+      "src_components_projects_components_componentheader_menu_menu_anim_ts"
+    ],
+    "84": [
+      "src_components_projects_components_sections_hoverimageslidemenu_teammember_db_ts"
+    ],
+    "85": [
+      "src_components_projects_components_sections_parallaxscroll_parallaximages_db_ts"
+    ],
+    "86": [
+      "src_components_projects_components_sections_scrolltextreveal_scrolltextreveal_section_tsx"
+    ],
+    "87": [
+      "src_components_projects_components_warning_projectwarning_tsx"
+    ],
+    "88": [
+      "src_components_projects_design_design_db_ts"
+    ],
+    "89": [
+      "src_components_projects_design_design_section_tsx"
+    ],
+    "90": [
+      "src_components_svg_sahilsatpute_icon_tsx"
+    ],
+    "91": [
+      "src_components_warnings_motionpage_motioninfo_data_ts"
+    ],
+    "92": [
+      "src_test_setup_ts"
+    ],
+    "93": [
+      "src_utils_colors_utils_ts"
+    ],
+    "94": [
+      "src_utils_image_util_ts"
+    ],
+    "95": [
+      "src_utils_index_util_ts"
+    ]
+  },
+  "cohesion": {
+    "0": 0.18,
+    "1": 0.25,
+    "2": 0.33,
+    "3": 0.33,
+    "4": 0.33,
+    "5": 0.4,
+    "6": 0.4,
+    "7": 0.4,
+    "8": 0.5,
+    "9": 0.67,
+    "10": 0.67,
+    "11": 0.67,
+    "12": 0.67,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0
+  },
+  "gods": [
+    {
+      "id": "page_page",
+      "label": "page()",
+      "degree": 5
+    },
+    {
+      "id": "useprefersreducedmotion_hook_useshouldusemotion",
+      "label": "useShouldUseMotion()",
+      "degree": 4
+    },
+    {
+      "id": "layout_rootlayout",
+      "label": "RootLayout()",
+      "degree": 3
+    },
+    {
+      "id": "paragraphgsap_paragraphgsap",
+      "label": "ParagraphGsap()",
+      "degree": 2
+    },
+    {
+      "id": "pagenotfound_section_pagenotfound",
+      "label": "PageNotFound()",
+      "degree": 2
+    },
+    {
+      "id": "homeskills_section_homeskills",
+      "label": "HomeSkills()",
+      "degree": 2
+    },
+    {
+      "id": "parallaximages_component_parallaximages",
+      "label": "ParallaxImages()",
+      "degree": 2
+    },
+    {
+      "id": "pagetransition_context_usepagetransitioncontext",
+      "label": "usePageTransitionContext()",
+      "degree": 2
+    },
+    {
+      "id": "transitionlink_component_transitionlink",
+      "label": "TransitionLink()",
+      "degree": 2
+    },
+    {
+      "id": "useresponsive_hook_useresponsive",
+      "label": "useResponsive()",
+      "degree": 2
+    }
+  ],
+  "surprises": [
+    {
+      "source": "RootLayout()",
+      "target": "useFonts()",
+      "source_files": [
+        "F:\\code\\sahil-new-in\\src\\app\\(client)\\reduce-motion-info\\layout.tsx",
+        "F:\\code\\sahil-new-in\\src\\utils\\fonts.util.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "ParagraphGsap()",
+      "target": "useShouldUseMotion()",
+      "source_files": [
+        "F:\\code\\sahil-new-in\\src\\components\\animations\\paragraph-gsap\\ParagraphGsap.tsx",
+        "F:\\code\\sahil-new-in\\src\\hooks\\usePrefersReducedMotion.hook.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "PageNotFound()",
+      "target": "useResponsive()",
+      "source_files": [
+        "F:\\code\\sahil-new-in\\src\\components\\default\\not-found\\PageNotFound.section.tsx",
+        "F:\\code\\sahil-new-in\\src\\hooks\\useResponsive.hook.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "HomeSkills()",
+      "target": "useShouldUseMotion()",
+      "source_files": [
+        "F:\\code\\sahil-new-in\\src\\components\\home\\skills\\HomeSkills.section.tsx",
+        "F:\\code\\sahil-new-in\\src\\hooks\\usePrefersReducedMotion.hook.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    },
+    {
+      "source": "ParallaxImages()",
+      "target": "useShouldUseMotion()",
+      "source_files": [
+        "F:\\code\\sahil-new-in\\src\\components\\projects\\components\\sections\\parallaxScroll\\ParallaxImages.component.tsx",
+        "F:\\code\\sahil-new-in\\src\\hooks\\usePrefersReducedMotion.hook.ts"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories"
+    }
+  ],
+  "questions": [
+    {
+      "type": "verify_inferred",
+      "question": "Are the 3 inferred relationships involving `useShouldUseMotion()` (e.g. with `ParagraphGsap()` and `HomeSkills()`) actually correct?",
+      "why": "`useShouldUseMotion()` has 3 INFERRED edges - model-reasoned connections that need verification."
+    }
+  ]
+}

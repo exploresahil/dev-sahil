@@ -1,0 +1,88 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#Components {
+  padding-block: rem(40) rem(40);
+  display: flex;
+  flex-direction: column;
+  gap: rem(30);
+  @include full_width;
+
+  .components {
+    display: flex;
+    flex-direction: column;
+    gap: rem(16);
+
+    @include breakpoint(medium) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include breakpoint(large) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    a {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      //background-color: $c_text_primary;
+      border: rem(1) solid $color_default_dark;
+      padding: rem(20) rem(20);
+      color: $color_default_dark;
+      font-size: rem(18);
+      position: relative;
+      overflow: hidden;
+
+      @include breakpoint(large) {
+        transition:
+          color 300ms $easing_default,
+          border 300ms $easing_default;
+
+        &::before {
+          content: "";
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background-color: $color_primary;
+          top: 100%;
+          left: 0;
+          z-index: -1;
+          transition: top 250ms $easing_default;
+        }
+
+        &:hover {
+          border: rem(1) solid $color_primary;
+          color: $color_default_light;
+
+          &::before {
+            top: 0;
+          }
+
+          .left {
+            p {
+              color: $color_default_light;
+            }
+          }
+        }
+      }
+
+      .left {
+        display: flex;
+        flex-direction: column;
+        max-width: 80%;
+        gap: rem(10);
+
+        h4 {
+          font-weight: 600;
+        }
+
+        p {
+          font-size: rem(14);
+          color: $color_default_dark;
+          transition: color 250ms $easing_default;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,117 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+.home_loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: rem(40);
+  pointer-events: all;
+  transition:
+    opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.exiting {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  // ── Grid Box Loader ────────────────────────────────────────────────────────
+
+  .grid_loader {
+    position: relative;
+    width: rem(56);
+    height: rem(56);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: rem(4);
+  }
+
+  .grid_box {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.75); // Translucent white squares
+    transition:
+      background-color 0.1s linear,
+      box-shadow 0.1s linear;
+
+    &.active {
+      background-color: $color_primary; // Red active square
+      box-shadow: 0 0 rem(8) $color_primary;
+      z-index: 2;
+    }
+  }
+
+  // ── Boot text ────────────────────────────────────────────────────────────
+
+  .loader_text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(8);
+  }
+
+  .loader_label {
+    font-family: $font_default_mono;
+    font-size: rem(10);
+    letter-spacing: 0.3em;
+    color: rgba($color_secondary, 0.75);
+    text-transform: uppercase;
+    animation: text_blink 2.4s $easing_default infinite;
+  }
+
+  .loader_dots {
+    display: flex;
+    gap: rem(5);
+
+    span {
+      width: rem(3);
+      height: rem(3);
+      border-radius: 0; // Square points for a digital feel
+      background: $color_default_light;
+      animation: dot_seq 1.6s $easing_default infinite;
+
+      &:nth-child(2) {
+        animation-delay: 0.24s;
+      }
+      &:nth-child(3) {
+        animation-delay: 0.48s;
+      }
+    }
+  }
+}
+
+// ── Keyframes ────────────────────────────────────────────────────────────────
+
+@keyframes text_blink {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes dot_seq {
+  0%,
+  80%,
+  100% {
+    transform: scaleX(0.5) scaleY(0.5);
+    opacity: 0.3;
+  }
+  40% {
+    // Stretches horizontally to mimic digital distortion
+    transform: scaleX(2) scaleY(0.8);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,89 @@
+@use "../../../../app/(client)/scss/abstracts" as *;
+
+#ProjectLinks {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: rem(10);
+  padding-block: rem(10);
+  position: relative;
+  overflow: hidden;
+
+  @include breakpoint(large) {
+    transition: padding-inline 0.3s $easing_default;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 100%;
+      left: 0;
+      background-color: $color_primary;
+      transition: top 0.3s $easing_default;
+      z-index: -1;
+    }
+
+    &:hover {
+      padding-inline: rem(12);
+
+      &::before {
+        top: 0;
+      }
+
+      .project_links_index {
+        color: $color_default_light;
+      }
+
+      .project_links_title {
+        h3 {
+          color: $color_default_light;
+        }
+        p {
+          color: $color_secondary;
+        }
+      }
+
+      .move_right_icon {
+        color: $color_default_light;
+      }
+    }
+  }
+
+  .project_links_index {
+    font-size: rem(12);
+    color: $color_primary;
+    margin-top: rem(5);
+    transition: color 0.3s $easing_default;
+  }
+
+  .project_links_title {
+    flex: 1;
+
+    h3 {
+      font-size: rem(24);
+      font-weight: 200;
+      color: $color_primary;
+      transition: color 0.3s $easing_default;
+    }
+
+    p {
+      font-size: rem(12);
+      font-family: $font_default_mono;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      transition: color 0.3s $easing_default;
+
+      @include breakpoint(large) {
+        font-size: rem(10);
+      }
+    }
+  }
+
+  .move_right_icon {
+    color: $color_primary;
+    align-self: center;
+    transition: color 0.3s $easing_default;
+  }
+}

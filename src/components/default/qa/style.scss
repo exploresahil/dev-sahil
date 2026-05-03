@@ -1,0 +1,47 @@
+@use "../../../app/(client)/scss/abstracts" as *;
+
+#Qa {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: rem(10);
+
+  @include breakpoint(large) {
+    gap: rem(16);
+  }
+
+  .qa_item {
+    width: 100%;
+
+    button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: rem(10);
+      padding-block: rem(10);
+
+      h4 {
+        font-size: rem(20);
+        font-weight: 400;
+        text-align: left;
+        font-family: $font_default_mono;
+        letter-spacing: -1;
+      }
+
+      .icon {
+        width: fit-content;
+        height: fit-content;
+      }
+    }
+  }
+
+  .qa_content {
+    overflow: hidden;
+    font-weight: 200;
+    max-width: 90%;
+
+    p {
+      white-space: pre-line;
+    }
+  }
+}
